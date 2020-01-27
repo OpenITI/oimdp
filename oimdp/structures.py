@@ -21,19 +21,84 @@ class SimpleMetadataField:
         return self.value
 
 
+class PhrasePart:
+    """A phrase-level tag"""
+    def __init__(self, orig: str):
+        self.orig = orig
+
+    def __str__(self):
+        return self.orig
+
+
+class NamedEntity(PhrasePart):
+    """A named entity"""
+    def __init__(self, orig: str, value: str, ne_type: str):
+        self.orig = orig
+        self.value = value
+        self.ne_type = ne_type
+
+    def __str__(self):
+        return self.value
+
+
+class OpenTagUser(PhrasePart):
+    """A custom tag added by a specific user"""
+    def __init__(self, orig: str, value: str, user: str, t_type: str):
+        self.orig = orig
+        self.value = value
+        self.user = user
+        self.t_type = t_type
+
+    def __str__(self):
+        return self.value
+
+
+class OpenTagAuto(PhrasePart):
+    """A custom tag added automatically"""
+    def __init__(self, orig: str, value: str, resp: str,
+                 t_type: str, category: str, review: str):
+        self.orig = orig
+        self.value = value
+        self.resp = resp
+        self.t_type = t_type
+        self.category = category
+        self.review = review
+
+    def __str__(self):
+        return self.value
+
+
+class Milestone(PhrasePart):
+    """Milestone typically used for splitting text in 300-word blocks"""
+    def __str__(self):
+        return ""
+
+
 class Line:
     """A line of text"""
-    def __init__(self, orig: str, text_only: str, parts):
+    def __init__(self, orig: str, text_only: str, parts: List[PhrasePart]):
         self.orig = orig
         self.text_only = text_only
         self.parts = parts
+
+    def add_line_part(self, part: PhrasePart):
+        return ""
 
     def __str__(self):
         """returns the whole line without tags"""
         return self.text_only
 
 
-class Verse:
+class Content:
+    """A content structure"""
+    def __init__(self, orig: str):
+        self.orig = orig
+
+    def __str__(self):
+        return self.orig
+
+
+class Verse(Content):
     """A line of poetry"""
     def __init__(self, orig: str, line: Line):
         self.orig = orig
@@ -44,7 +109,7 @@ class Verse:
         return self.line
 
 
-class Paragraph:
+class Paragraph(Content):
     """A paragraph contaning a list of lines"""
     def __init__(self, lines: List[Line]):
         self.lines = lines
@@ -52,11 +117,11 @@ class Paragraph:
     def add_line(self, line: Line):
         self.lines.append(line)
 
-    def __str__(self):        
+    def __str__(self):
         return "\n".join([str(l) for l in self.lines])
 
 
-class PageNumber:
+class PageNumber(Content):
     """A page and volume number"""
     def __init__(self, orig: str, vol: str, page: str):
         self.orig = orig
@@ -65,6 +130,85 @@ class PageNumber:
 
     def __str__(self):
         return f"Vol. {self.volume}, p. {self.page}"
+
+
+class SectionHeader(Content):
+    """A section header"""
+    def __init__(self, orig: str, value: str, level: int):
+        self.orig = orig
+        self.value = value
+        self.level = level
+
+    def __str__(self):
+        return self.value
+
+
+class Editorial(Content):
+    """Marks the beginning of an editorial section"""
+    def __init__(self, orig: str):
+        self.orig = orig
+
+    def __str__(self):
+        return ""
+
+
+class DictionaryUnit(Content):
+    """Marks a dictionary unit"""
+    def __init__(self, orig: str, value: str, dic_type: str):
+        self.orig = orig
+        self.value = value
+        self.dic_type = dic_type
+
+    def __str__(self):
+        return self.value
+
+
+class BioOrEvent(Content):
+    """Marks a biography or an event"""
+    def __init__(self, orig: str, value: str, be_type: str):
+        self.orig = orig
+        self.value = value
+        self.be_type = be_type
+
+    def __str__(self):
+        return self.value
+
+
+class DoxographicalItem(Content):
+    """Marks a doxographical section"""
+    def __init__(self, orig: str, value: str, dox_type: str):
+        self.orig = orig
+        self.value = value
+        self.dox_type = dox_type
+
+    def __str__(self):
+        return self.value
+
+
+class MorphologicalPattern(Content):
+    """A milestone to tag passages that can be categorized thematically."""
+    def __init__(self, orig: str, category: str):
+        self.orig = orig
+        self.category = category
+
+    def __str__(self):
+        return ""
+
+
+class AdministrativeRegion(Content):
+    """An administrative region"""
+    # TODO
+
+    def __str__(self):
+        return ""
+
+
+class RouteOrDistance(Content):
+    """A route or distance"""
+    # TODO
+
+    def __str__(self):
+        return ""
 
 
 class Document:
@@ -80,14 +224,8 @@ class Document:
     def set_simple_metadata_field(self, orig: str, value: str):
         self.simple_metadata.append(SimpleMetadataField(orig, value))
 
-    def set_page_number(self, page: PageNumber):
-        self.content.append(page)
-
-    def set_paragraph(self, para: Paragraph):
-        self.content.append(para)
-
-    def set_verse_line(self, verse: Verse):
-        self.content.append(verse)
+    def add_content(self, content: Content):
+        self.content.append(content)
 
     def get_clean_text(self, includeMetadata: bool = False):
         text = ""
