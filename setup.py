@@ -1,16 +1,20 @@
-from setuptools import setup, find_packages
+from setuptools import setup
 
-with open("README.md", "r") as fh:
-    long_description = fh.read()
+version = "0.0.1"
+
+with open("README.md") as f:
+    long_description = f.read()
 
 setup(
-    name='oimdp',
-    version='0.0.1',
-    url='https://github.com/umd-mith/oimdp',
-    author='Raff Viglianti',
-    description='OpenITI mARkdown Parser',
+    name="oimdp",
+    version=version,
+    url="http://github.com/umd-mith/oimdp",
+    author="Raff Viglianti",
+    author_email="rviglian@umd.edu",
+    packages=["oimdp"],
+    description="OpenITI mARkdown Parser",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    license='Apache 2.0',
-    packages=find_packages(),
+    test_suite="test",
+    python_requires=">=3.6.*",
 )
