@@ -30,6 +30,10 @@ class PhrasePart:
         return self.orig
 
 
+class TextPart(PhrasePart):
+    """Phrase-level text"""
+
+
 class NamedEntity(PhrasePart):
     """A named entity"""
     def __init__(self, orig: str, value: str, ne_type: str):
@@ -74,19 +78,51 @@ class Milestone(PhrasePart):
         return ""
 
 
-class Line:
-    """A line of text"""
-    def __init__(self, orig: str, text_only: str, parts: List[PhrasePart]):
+class RiwayatPart(PhrasePart):
+    """Part of a riwāyaŧ unit"""
+    def __init__(self, orig: str, value: str):
         self.orig = orig
-        self.text_only = text_only
-        self.parts = parts
-
-    def add_line_part(self, part: PhrasePart):
-        return ""
+        self.value = value
 
     def __str__(self):
-        """returns the whole line without tags"""
-        return self.text_only
+        return self.value
+
+
+class Isnad(RiwayatPart):
+    """An isnād part of a riwāyaŧ unit"""
+
+
+class Matn(RiwayatPart):
+    """A matn part of a riwāyaŧ unit"""
+
+
+class Hukm(RiwayatPart):
+    """A ḥukm part of a riwāyaŧ unit"""
+
+
+class Line:
+    """A line of text, typically within a Content object"""
+    def __init__(self, orig: str, text_only: str, parts: List[PhrasePart] = []):
+        self.orig = orig
+        self.text_only = text_only
+        self.parts = parts.copy()
+
+    def add_part(self, part: PhrasePart):
+        self.parts.append(part)
+
+    def __str__(self):
+        return "".join([str(p) for p in self.parts])
+
+
+class PageNumber():
+    """A page and volume number. Can be Content or PhraseLevel object"""
+    def __init__(self, orig: str, vol: str, page: str):
+        self.orig = orig
+        self.page = page
+        self.volume = vol
+
+    def __str__(self):
+        return f"Vol. {self.volume}, p. {self.page}"
 
 
 class Content:
@@ -119,17 +155,6 @@ class Paragraph(Content):
 
     def __str__(self):
         return "\n".join([str(l) for l in self.lines])
-
-
-class PageNumber(Content):
-    """A page and volume number"""
-    def __init__(self, orig: str, vol: str, page: str):
-        self.orig = orig
-        self.page = page
-        self.volume = vol
-
-    def __str__(self):
-        return f"Vol. {self.volume}, p. {self.page}"
 
 
 class SectionHeader(Content):
@@ -209,6 +234,10 @@ class RouteOrDistance(Content):
 
     def __str__(self):
         return ""
+
+
+class Riwayat(Paragraph):
+    """Riwāyāt unit"""
 
 
 class Document:

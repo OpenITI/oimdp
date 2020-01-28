@@ -1,11 +1,12 @@
 import sys
 import re
-from .structures import Document, PageNumber, Paragraph, Line, Verse
+from .structures import Document, PageNumber, Paragraph, Line, Verse, Milestone
 from .structures import SectionHeader, Editorial, DictionaryUnit, BioOrEvent
-from .structures import DoxographicalItem, MorphologicalPattern
-from .structures import AdministrativeRegion, RouteOrDistance
+from .structures import DoxographicalItem, MorphologicalPattern, TextPart
+from .structures import AdministrativeRegion, RouteOrDistance, Riwayat
 from . import tags as t
 
+PAGE_PATTERN = re.compile(r"PageV(\d+)P(\d+)")
 OPEN_TAG_CUSTOM_PATTERN = re.compile(
     r"@([^@]+?)@([^_@]+?)_([^_@]+?)(_([^_@]+?))?@"
 )
@@ -25,6 +26,7 @@ def remove_phrase_lv_tags(s: str):
     # Open tag
     text_only = OPEN_TAG_CUSTOM_PATTERN.sub('', text_only)
     text_only = OPEN_TAG_AUTO_PATTERN.sub('', text_only)
+    text_only = PAGE_PATTERN.sub('', text_only)
     return text_only
 
 
@@ -33,24 +35,25 @@ def parse_line(tagged_il: str):
     il = tagged_il.replace(t.LINE, '')
 
     # get clean text
-    text_only = tagged_il.replace("#", '').replace(t.LINE, '')
+    text_only = il
     text_only = remove_phrase_lv_tags(text_only)
 
-    line = Line(il, text_only, il)
+    line = Line(il, text_only)
 
     # TODO: deal with line parts, which is needed to support conversion
-    # to other tag systems. Below is a first stab, but need to
-    # figure out how to split the line appropriately.
+    # to other tag systems.
 
-    # Hemistichs
-    # if (HEMI in il):
-    #     for (hemi in il.split(HEMI)):
-    #         # mark as hemi and process further by calling parse_tags()
+    # Split the line by tags. Make sure patterns do not include subgroups!
+    tokens = re.split(rf"(PageV\d+P\d+|{t.MILESTONE})", il)
 
-    # Milestones
-    # if (MILESTONE in il):
-    #     line.add_line_part(Milestone())
-
+    for token in tokens:
+        if (t.PAGE in token):
+            m = PAGE_PATTERN.search(token)
+            line.add_part(PageNumber(token, m.group(1), m.group(2)))
+        elif (t.MILESTONE in token):
+            line.add_part(Milestone(token))
+        else:
+            line.add_part(TextPart(token))
     return line
 
 
@@ -75,8 +78,7 @@ def parser(text):
     current_structure = document
 
     # RE patterns
-    para_pattern = re.compile(r"^#($|[^#])")
-    page_pattern = re.compile(r"PageV(\d+)P(\d+)")
+    para_pattern = re.compile(r"^#($|[^#])")    
     bio_pattern = re.compile(rf"{t.BIO_MAN}[^\w]")
     morpho_pattern = re.compile(r"#~:([^:]+?):")
     region_pattern = re.compile(
@@ -99,14 +101,21 @@ def parser(text):
             value = il.split(t.META, 1)[1].strip()
             document.set_simple_metadata_field(il, value)
 
-        # Page numbers
-        elif (t.PAGE in il):
-            pv = page_pattern.search(il)
+        # Content-level page numbers
+        elif (il.startswith(t.PAGE)):
+            pv = PAGE_PATTERN.search(il)
             document.add_content(PageNumber(il, pv.group(1), pv.group(2)))
+
+        # Riwāyāt units
+        elif (il.startswith(t.RWY)):
+            # Set first line, skipping para marker "#""
+            first_line = parse_line(il[1:])
+            current_structure = Riwayat([first_line])
 
         # Paragraphs and lines of verse
         elif (para_pattern.search(il)):
-            first_line = parse_line(il)
+            # Set first line, skipping para marker "#""
+            first_line = parse_line(il[1:])
             if (t.HEMI in il):
                 # this is a verse line
                 document.add_content(Verse(il, first_line))
@@ -114,9 +123,10 @@ def parser(text):
                 current_structure = Paragraph([first_line])
                 document.add_content(current_structure)
 
-        # Paragraph lines
+        # Paragraph or Riwāyāt unit lines
         elif (il.startswith(t.LINE)):
-            if (isinstance(current_structure, Paragraph)):
+            if (isinstance(current_structure, Paragraph) or
+               isinstance(current_structure, Riwayat)):
                 current_structure.add_line(parse_line(il))
 
         # Editorial section

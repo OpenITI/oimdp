@@ -41,8 +41,11 @@ class TestStringMethods(unittest.TestCase):
     #             print(content.lines[1])
     #             break
 
+    # TODO: other tests.
+
     def test_clean_text(self):
-        print(self.parsed.get_clean_text(True))
+        text = self.parsed.get_clean_text(True)
+        # print(text)
 
 
 if __name__ == "__main__":

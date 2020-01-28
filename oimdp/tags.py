@@ -49,6 +49,9 @@ STTL = "#$#STTL"
 DIST_FROM = "#$#FROM"
 DIST_TO = "#$#TOWA"
 DIST = "#$#DIST"
+RWY = "# $RWY$"
+MATN = "@MATN@"
+HUKM = "@HUKM@"
 
 # GROUPS
 # NB these are listed to allow safe replacement, e.g. "### ||" before "### |"
