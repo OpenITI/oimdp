@@ -15,6 +15,6 @@ setup(
     description="OpenITI mARkdown Parser",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    test_suite="test",
+    test_suite="tests",
     python_requires=">=3.6.*",
 )
