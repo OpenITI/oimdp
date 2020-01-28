@@ -102,10 +102,13 @@ class Hukm(RiwayatPart):
 
 class Line:
     """A line of text, typically within a Content object"""
-    def __init__(self, orig: str, text_only: str, parts: List[PhrasePart] = []):
+    def __init__(self, orig: str, text_only: str, parts: List[PhrasePart] = None):
         self.orig = orig
         self.text_only = text_only
-        self.parts = parts.copy()
+        if (parts is None):
+            self.parts = []
+        else:
+            self.parts = parts
 
     def add_part(self, part: PhrasePart):
         self.parts.append(part)
