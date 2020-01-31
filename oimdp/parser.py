@@ -30,7 +30,7 @@ def remove_phrase_lv_tags(s: str):
     return text_only
 
 
-def parse_line(tagged_il: str):
+def parse_line(tagged_il: str, index: int):
     # remove line tag
     il = tagged_il.replace(t.LINE, '')
 
@@ -49,7 +49,12 @@ def parse_line(tagged_il: str):
     for token in tokens:
         if (t.PAGE in token):
             m = PAGE_PATTERN.search(token)
-            line.add_part(PageNumber(token, m.group(1), m.group(2)))
+            try:
+                line.add_part(PageNumber(token, m.group(1), m.group(2)))
+            except Exception:
+                raise Exception(
+                    'Could not parse page number at line: ' + str(index+1)
+                )
         elif (t.MILESTONE in token):
             line.add_part(Milestone(token))
         else:
@@ -89,7 +94,7 @@ def parser(text):
     )
 
     # Input lines loop
-    for il in ilines:
+    for i, il in enumerate(ilines):
 
         # N.B. if order matters! We're doing string matching
         # and tag elements are re-used.
@@ -104,18 +109,23 @@ def parser(text):
         # Content-level page numbers
         elif (il.startswith(t.PAGE)):
             pv = PAGE_PATTERN.search(il)
-            document.add_content(PageNumber(il, pv.group(1), pv.group(2)))
+            try:
+                document.add_content(PageNumber(il, pv.group(1), pv.group(2)))
+            except Exception:
+                raise Exception(
+                    'Could not parse page number at line: ' + str(i+1)
+                )
 
         # Riwāyāt units
         elif (il.startswith(t.RWY)):
             # Set first line, skipping para marker "#""
-            first_line = parse_line(il[1:])
+            first_line = parse_line(il[1:], i)
             current_structure = Riwayat([first_line])
 
         # Paragraphs and lines of verse
         elif (para_pattern.search(il)):
             # Set first line, skipping para marker "#""
-            first_line = parse_line(il[1:])
+            first_line = parse_line(il[1:], i)
             if (t.HEMI in il):
                 # this is a verse line
                 document.add_content(Verse(il, first_line))
@@ -127,7 +137,7 @@ def parser(text):
         elif (il.startswith(t.LINE)):
             if (isinstance(current_structure, Paragraph) or
                isinstance(current_structure, Riwayat)):
-                current_structure.add_line(parse_line(il))
+                current_structure.add_line(parse_line(il, i))
 
         # Editorial section
         # TODO: this section contains paragraphs. Keeping as milestone for now.
