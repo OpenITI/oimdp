@@ -8,7 +8,7 @@ with open("README.md") as f:
 setup(
     name="oimdp",
     version=version,
-    url="http://github.com/umd-mith/oimdp",
+    url="http://github.com/OpenITI/oimdp",
     author="Raff Viglianti",
     author_email="rviglian@umd.edu",
     packages=["oimdp"],
@@ -16,5 +16,5 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     test_suite="tests",
-    python_requires=">=3.6.*",
+    python_requires=">=3.7.*",
 )
