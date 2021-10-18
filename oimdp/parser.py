@@ -84,7 +84,7 @@ def parser(text):
 
     # RE patterns
     para_pattern = re.compile(r"^#($|[^#])")    
-    bio_pattern = re.compile(rf"{t.BIO_MAN}[^\w]")
+    bio_pattern = re.compile(rf"{re.escape(t.BIO_MAN)}[^#]")
     morpho_pattern = re.compile(r"#~:([^:]+?):")
     region_pattern = re.compile(
         rf"({t.PROV}|{t.REG}\d) .*? {t.GEO_TYPE} .*? ({t.REG}\d|{t.STTL}) ([\w# ]+) $"
@@ -95,7 +95,7 @@ def parser(text):
 
     # Input lines loop
     for i, il in enumerate(ilines):
-
+        
         # N.B. if order matters! We're doing string matching
         # and tag elements are re-used.
 
@@ -110,7 +110,12 @@ def parser(text):
         elif (il.startswith(t.PAGE)):
             pv = PAGE_PATTERN.search(il)
             try:
-                document.add_content(PageNumber(il, pv.group(1), pv.group(2)))
+                if not isinstance(current_structure, Document):
+                    # print(type(current_structure).__name__)
+                    current_structure.add_line(parse_line(il, i))
+                else:
+                    # print(type(current_structure).__name__)
+                    document.add_content(PageNumber(il, pv.group(1), pv.group(2)))
             except Exception:
                 raise Exception(
                     'Could not parse page number at line: ' + str(i+1)
@@ -181,7 +186,7 @@ def parser(text):
             document.add_content(DictionaryUnit(il, value, dic_type))
 
         # Biographies and Events
-        elif (bio_pattern.search(il) or il.startswith(t.EVENT)):
+        elif (bio_pattern.search(il) or il.startswith(t.BIO) or il.startswith(t.EVENT)):
             value = il
             for tag in t.BIOS_EVENTS:
                 value = value.replace(tag, '')
@@ -191,15 +196,16 @@ def parser(text):
             be_type = "man"
             if (t.BIO_WOM in il):
                 be_type = "wom"
-            elif (t.BIO_REP in il):
-                be_type = "rep"
+            elif (t.BIO_REF in il):
+                be_type = "ref"
             elif (t.LIST_NAMES in il):
                 be_type = "names"
             elif (t.EVENT in il):
                 be_type = "event"
             elif (t.LIST_EVENTS in il):
                 be_type = "events"
-            document.add_content(BioOrEvent(il, value, be_type))
+            current_structure = BioOrEvent(il, value, be_type, [value])
+            document.add_content(current_structure)
 
         # Doxographical item
         elif (il.startswith(t.DOX)):

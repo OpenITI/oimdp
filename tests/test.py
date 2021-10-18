@@ -2,9 +2,9 @@ import sys
 import os
 sys.path.append(
     os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
-import unittest
+import unittest 
 import oimdp
-from oimdp.structures import PageNumber, Paragraph
+from oimdp.structures import BioOrEvent, PageNumber, Paragraph
 
 
 class TestStringMethods(unittest.TestCase):
@@ -24,28 +24,35 @@ class TestStringMethods(unittest.TestCase):
         self.assertEqual(str(self.parsed.magic_value), "######OpenITI#")
 
     def test_meta(self):
-        self.assertEqual(str(self.parsed.simple_metadata[0]),
+        self.assertEqual(str(self.parsed.simple_metadata[1]),
                          "000.SortField	:: Shamela_0023833")
         self.assertEqual(str(self.parsed.simple_metadata[-1]),
                          "999.MiscINFO	:: NODATA")
 
     def test_page(self):
-        for content in self.parsed.content:
-            if (isinstance(content, PageNumber)):
-                self.assertEqual(str(content), "Vol. 00, p. 000")
-                break
+        self.assertTrue(isinstance(self.parsed.content[0].lines[0].parts[1], 
+                        PageNumber))
+        self.assertEqual(str(self.parsed.content[0].lines[0].parts[1]),
+                         "Vol. 00, p. 000")
 
-    # def test_para(self):
-    #     for content in self.parsed.content:
-    #         if (isinstance(content, Paragraph)):
-    #             print(content.lines[1])
-    #             break
+    def test_bio_or_event(self):
+        bioman_full = self.parsed.content[1]
+        self.assertTrue(isinstance(bioman_full, 
+                        BioOrEvent))
+        self.assertEqual(bioman_full.value, " أبو عمرو ابن العلاء واسمه")
+        self.assertEqual(bioman_full.be_type, "man")
+
+        bioman = self.parsed.content[2]
+        self.assertTrue(isinstance(bioman, 
+                        BioOrEvent))
+        self.assertEqual(bioman.value, " أبو عمرو ابن العلاء واسمه")
+        self.assertEqual(bioman.be_type, "man")
 
     # TODO: other tests.
 
-    def test_clean_text(self):
-        text = self.parsed.get_clean_text(True)
-        # print(text)
+    # def test_clean_text(self):
+    #     text = self.parsed.get_clean_text(True)
+    #     # print(text)
 
 
 if __name__ == "__main__":

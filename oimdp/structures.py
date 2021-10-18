@@ -191,12 +191,13 @@ class DictionaryUnit(Content):
         return self.value
 
 
-class BioOrEvent(Content):
+class BioOrEvent(Paragraph):
     """Marks a biography or an event"""
-    def __init__(self, orig: str, value: str, be_type: str):
+    def __init__(self, orig: str, value: str, be_type: str, lines: List[Line]):
         self.orig = orig
         self.value = value
         self.be_type = be_type
+        self.lines = lines
 
     def __str__(self):
         return self.value
