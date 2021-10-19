@@ -62,7 +62,7 @@ def parse_line(tagged_il: str, index: int):
     return line
 
 
-def parser(text):
+def parser(text: str):
     """Parses an OpenITI mARkdown file and returns a Document object"""
     document = Document(text)
 
@@ -187,24 +187,25 @@ def parser(text):
 
         # Biographies and Events
         elif (bio_pattern.search(il) or il.startswith(t.BIO) or il.startswith(t.EVENT)):
-            value = il
+            no_tag = il
             for tag in t.BIOS_EVENTS:
-                value = value.replace(tag, '')
+                no_tag = no_tag.replace(tag, '')
+            first_line = parse_line(no_tag, i)
             # remove other phrase level tags
-            value = remove_phrase_lv_tags(value)
-            # TODO: capture tags as PhraseParts
+            value = remove_phrase_lv_tags(no_tag)
             be_type = "man"
-            if (t.BIO_WOM in il):
-                be_type = "wom"
-            elif (t.BIO_REF in il):
-                be_type = "ref"
-            elif (t.LIST_NAMES in il):
+            # Ordered from longer to shorter string to aid matching. I.e. ### $$$ before ### $$
+            if (t.LIST_NAMES_FULL in il or t.LIST_NAMES in il):
                 be_type = "names"
-            elif (t.EVENT in il):
-                be_type = "event"
+            elif (t.BIO_REF_FULL in il or t.BIO_REF in il):
+                be_type = "ref"
+            elif (t.BIO_WOM_FULL in il or t.BIO_WOM in il):
+                be_type = "wom"
             elif (t.LIST_EVENTS in il):
                 be_type = "events"
-            current_structure = BioOrEvent(il, value, be_type, [value])
+            elif (t.EVENT in il):
+                be_type = "event"
+            current_structure = BioOrEvent(il, value, be_type, [first_line])
             document.add_content(current_structure)
 
         # Doxographical item

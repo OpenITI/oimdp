@@ -36,17 +36,24 @@ class TestStringMethods(unittest.TestCase):
                          "Vol. 00, p. 000")
 
     def test_bio_or_event(self):
-        bioman_full = self.parsed.content[1]
-        self.assertTrue(isinstance(bioman_full, 
-                        BioOrEvent))
-        self.assertEqual(bioman_full.value, " أبو عمرو ابن العلاء واسمه")
-        self.assertEqual(bioman_full.be_type, "man")
+        def check(location: int, type: str, lines_at_least: int = 0, val: str = ""):
+            content = self.parsed.content[location]
+            self.assertTrue(isinstance(content, BioOrEvent))
+            self.assertEqual(content.be_type, type)
+            self.assertGreaterEqual(len(content.lines), lines_at_least)
+            if len(val) > 0:
+                self.assertEqual(content.value, val)
 
-        bioman = self.parsed.content[2]
-        self.assertTrue(isinstance(bioman, 
-                        BioOrEvent))
-        self.assertEqual(bioman.value, " أبو عمرو ابن العلاء واسمه")
-        self.assertEqual(bioman.be_type, "man")
+        check(1, "man", 2, " أبو عمرو ابن العلاء واسمه")
+        check(2, "man", 2, " أبو عمرو ابن العلاء واسمه")
+        check(3, "wom", 2, " 1729 - صمعة بنت أحمد بن محمد بن عبيد الله الرئيس النيسابورية من ولد عثمان بن")
+        check(4, "wom", 2, " 1729 - صمعة بنت أحمد بن محمد بن عبيد الله الرئيس النيسابورية من ولد عثمان بن")
+        check(5, "ref", 2, " [a cross-reference, for both men and women]")
+        check(6, "ref", 2, " [a cross-reference, for both men and women]")
+        check(7, "names", 2, " -وفيها ولد: (@)(@@) المحدث عفيف ")
+        check(8, "names", 2, " -وفيها ولد: (@)(@@) المحدث عفيف ")
+        check(9, "events", 2)
+        check(10, "event", 2)
 
     # TODO: other tests.
 
