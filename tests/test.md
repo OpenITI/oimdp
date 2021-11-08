@@ -64,6 +64,14 @@ PageV00P030
 ~~event
 ### @
 ~~event
+### $DIC_NIS$
+~~dictionary entry
+### $DIC_TOP$
+~~dictionary entry
+### $DIC_LEX$
+~~dictionary entry
+### $DIC_BIB$
+~~dictionary entry
 ### |EDITOR|
 [السيرة النبوية]
 # المؤلف: عبد الملك بن هشام بن أيوب الحميري المعافري، أبو محمد، جمال

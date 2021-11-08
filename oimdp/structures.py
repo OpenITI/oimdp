@@ -180,12 +180,13 @@ class Editorial(Content):
         return ""
 
 
-class DictionaryUnit(Content):
+class DictionaryUnit(Paragraph):
     """Marks a dictionary unit"""
-    def __init__(self, orig: str, value: str, dic_type: str):
+    def __init__(self, orig: str, value: str, dic_type: str, lines: List[Line]):
         self.orig = orig
         self.value = value
         self.dic_type = dic_type
+        self.lines = lines
 
     def __str__(self):
         return self.value

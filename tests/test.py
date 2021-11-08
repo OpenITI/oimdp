@@ -4,7 +4,7 @@ sys.path.append(
     os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 import unittest 
 import oimdp
-from oimdp.structures import BioOrEvent, PageNumber, Paragraph
+from oimdp.structures import BioOrEvent, DictionaryUnit, PageNumber, Paragraph
 
 
 class TestStringMethods(unittest.TestCase):
@@ -19,6 +19,15 @@ class TestStringMethods(unittest.TestCase):
         self.text = test_file.read()
         test_file.close()
         self.parsed = oimdp.parse(self.text)
+
+    def generic_check(self, datatype, location: int, type: str, lines_at_least: int = 0, val: str = "", property: str = ""):
+            content = self.parsed.content[location]
+            self.assertTrue(isinstance(content, datatype))
+            if (len(property) > 0):
+                self.assertEqual(getattr(content, property), type)
+            self.assertGreaterEqual(len(content.lines), lines_at_least)
+            if len(val) > 0:
+                self.assertEqual(content.value, val)
 
     def test_magic(self):
         self.assertEqual(str(self.parsed.magic_value), "######OpenITI#")
@@ -36,13 +45,8 @@ class TestStringMethods(unittest.TestCase):
                          "Vol. 00, p. 000")
 
     def test_bio_or_event(self):
-        def check(location: int, type: str, lines_at_least: int = 0, val: str = ""):
-            content = self.parsed.content[location]
-            self.assertTrue(isinstance(content, BioOrEvent))
-            self.assertEqual(content.be_type, type)
-            self.assertGreaterEqual(len(content.lines), lines_at_least)
-            if len(val) > 0:
-                self.assertEqual(content.value, val)
+        def check(location: int, type: str, lines_at_least: int, val: str = ""):
+            self.generic_check(BioOrEvent, location, type, lines_at_least, val, "be_type")
 
         check(1, "man", 2, " أبو عمرو ابن العلاء واسمه")
         check(2, "man", 2, " أبو عمرو ابن العلاء واسمه")
@@ -54,6 +58,15 @@ class TestStringMethods(unittest.TestCase):
         check(8, "names", 2, " -وفيها ولد: (@)(@@) المحدث عفيف ")
         check(9, "events", 2)
         check(10, "event", 2)
+
+    def test_dictionary_unit(self):
+        def check(location: int, type: str, lines_at_least: int, val: str = ""):
+            self.generic_check(DictionaryUnit, location, type, lines_at_least, val, "dic_type")
+        
+        check(11, "nis", 2)
+        check(12, "top", 2)
+        check(13, "lex", 2)
+        check(14, "bib", 2)
 
     # TODO: other tests.
 

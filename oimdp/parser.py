@@ -170,11 +170,12 @@ def parser(text: str):
 
         # Dictionary entry
         elif (il.startswith(t.DIC)):
-            value = il
+            no_tag = il
             for tag in t.DICTIONARIES:
-                value = value.replace(tag, '')
+                no_tag = no_tag.replace(tag, '')
+            first_line = parse_line(no_tag, i)
             # remove other phrase level tags
-            value = remove_phrase_lv_tags(value)
+            value = remove_phrase_lv_tags(no_tag)
             # TODO: capture tags as PhraseParts
             dic_type = "bib"
             if (t.DIC_LEX in il):
@@ -183,7 +184,8 @@ def parser(text: str):
                 dic_type = "nis"
             elif (t.DIC_TOP in il):
                 dic_type = "top"
-            document.add_content(DictionaryUnit(il, value, dic_type))
+            current_structure = DictionaryUnit(il, value, dic_type, [first_line])
+            document.add_content(current_structure)
 
         # Biographies and Events
         elif (bio_pattern.search(il) or il.startswith(t.BIO) or il.startswith(t.EVENT)):
