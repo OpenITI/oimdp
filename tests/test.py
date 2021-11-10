@@ -20,14 +20,11 @@ class TestStringMethods(unittest.TestCase):
         test_file.close()
         self.parsed = oimdp.parse(self.text)
 
-    def generic_check(self, datatype, location: int, type: str, lines_at_least: int = 0, val: str = "", property: str = ""):
+    def generic_check(self, datatype, location: int, type: str, property: str = ""):
             content = self.parsed.content[location]
             self.assertTrue(isinstance(content, datatype))
             if (len(property) > 0):
                 self.assertEqual(getattr(content, property), type)
-            self.assertGreaterEqual(len(content.lines), lines_at_least)
-            if len(val) > 0:
-                self.assertEqual(content.value, val)
 
     def test_magic(self):
         self.assertEqual(str(self.parsed.magic_value), "######OpenITI#")
@@ -39,34 +36,50 @@ class TestStringMethods(unittest.TestCase):
                          "999.MiscINFO	:: NODATA")
 
     def test_page(self):
-        self.assertTrue(isinstance(self.parsed.content[0].lines[0].parts[1], 
+        self.assertTrue(isinstance(self.parsed.content[1].parts[1], 
                         PageNumber))
-        self.assertEqual(str(self.parsed.content[0].lines[0].parts[1]),
+        self.assertEqual(str(self.parsed.content[1].parts[1]),
                          "Vol. 00, p. 000")
 
     def test_bio_or_event(self):
-        def check(location: int, type: str, lines_at_least: int, val: str = ""):
-            self.generic_check(BioOrEvent, location, type, lines_at_least, val, "be_type")
+        def check(location: int, type: str):
+            self.generic_check(BioOrEvent, location, type, "be_type")
 
-        check(1, "man", 2, " أبو عمرو ابن العلاء واسمه")
-        check(2, "man", 2, " أبو عمرو ابن العلاء واسمه")
-        check(3, "wom", 2, " 1729 - صمعة بنت أحمد بن محمد بن عبيد الله الرئيس النيسابورية من ولد عثمان بن")
-        check(4, "wom", 2, " 1729 - صمعة بنت أحمد بن محمد بن عبيد الله الرئيس النيسابورية من ولد عثمان بن")
-        check(5, "ref", 2, " [a cross-reference, for both men and women]")
-        check(6, "ref", 2, " [a cross-reference, for both men and women]")
-        check(7, "names", 2, " -وفيها ولد: (@)(@@) المحدث عفيف ")
-        check(8, "names", 2, " -وفيها ولد: (@)(@@) المحدث عفيف ")
-        check(9, "events", 2)
-        check(10, "event", 2)
+        check(2, "man")
+        self.assertEqual(str(self.parsed.content[3].parts[0]),
+            " أبو عمرو ابن العلاء واسمه")
+        check(8, "man")
+        self.assertEqual(str(self.parsed.content[9].parts[0]),
+            " أبو عمرو ابن العلاء واسمه")
+        check(14, "wom")
+        self.assertEqual(str(self.parsed.content[15].parts[0]),
+            " 1729 - صمعة بنت أحمد بن محمد بن عبيد الله الرئيس النيسابورية من ولد عثمان بن")
+        check(17, "wom")
+        self.assertEqual(str(self.parsed.content[18].parts[0]),
+            " 1729 - صمعة بنت أحمد بن محمد بن عبيد الله الرئيس النيسابورية من ولد عثمان بن")
+        check(20, "ref")
+        self.assertEqual(str(self.parsed.content[21].parts[0]),
+            " [a cross-reference, for both men and women]")
+        check(23, "ref")
+        self.assertEqual(str(self.parsed.content[24].parts[0]),
+            " [a cross-reference, for both men and women]")
+        check(26, "names")
+        self.assertEqual(str(self.parsed.content[27].parts[0]),
+            " -وفيها ولد: (@)(@@) المحدث عفيف ")
+        check(29, "names")
+        self.assertEqual(str(self.parsed.content[30].parts[0]),
+            " -وفيها ولد: (@)(@@) المحدث عفيف ")
+        check(32, "events")
+        check(34, "event")
 
     def test_dictionary_unit(self):
-        def check(location: int, type: str, lines_at_least: int, val: str = ""):
-            self.generic_check(DictionaryUnit, location, type, lines_at_least, val, "dic_type")
+        def check(location: int, type: str):
+            self.generic_check(DictionaryUnit, location, type, "dic_type")
         
-        check(11, "nis", 2)
-        check(12, "top", 2)
-        check(13, "lex", 2)
-        check(14, "bib", 2)
+        check(36, "nis")
+        check(38, "top")
+        check(40, "lex")
+        check(42, "bib")
 
     # TODO: other tests.
 

@@ -30,7 +30,7 @@ def remove_phrase_lv_tags(s: str):
     return text_only
 
 
-def parse_line(tagged_il: str, index: int):
+def parse_line(tagged_il: str, index: int, obj=Line):
     # remove line tag
     il = tagged_il.replace(t.LINE, '')
 
@@ -38,7 +38,10 @@ def parse_line(tagged_il: str, index: int):
     text_only = il
     text_only = remove_phrase_lv_tags(text_only)
 
-    line = Line(il, text_only)
+    if text_only == "":
+        return None
+
+    line = obj(il, text_only)
 
     # TODO: deal with line parts, which is needed to support conversion
     # to other tag systems.
@@ -79,9 +82,6 @@ def parser(text: str):
 
     document.set_magic_value(magic_value)
 
-    # Structure stack
-    current_structure = document
-
     # RE patterns
     para_pattern = re.compile(r"^#($|[^#])")    
     bio_pattern = re.compile(rf"{re.escape(t.BIO_MAN)}[^#]")
@@ -96,8 +96,8 @@ def parser(text: str):
     # Input lines loop
     for i, il in enumerate(ilines):
         
-        # N.B. if order matters! We're doing string matching
-        # and tag elements are re-used.
+        # N.B. the order of if statements matters!
+        # We're doing string matching and tag elements are re-used.
 
         # Non-machine readable metadata
         if (il.startswith(t.META)):
@@ -110,12 +110,7 @@ def parser(text: str):
         elif (il.startswith(t.PAGE)):
             pv = PAGE_PATTERN.search(il)
             try:
-                if not isinstance(current_structure, Document):
-                    # print(type(current_structure).__name__)
-                    current_structure.add_line(parse_line(il, i))
-                else:
-                    # print(type(current_structure).__name__)
-                    document.add_content(PageNumber(il, pv.group(1), pv.group(2)))
+                document.add_content(PageNumber(il, pv.group(1), pv.group(2)))
             except Exception:
                 raise Exception(
                     'Could not parse page number at line: ' + str(i+1)
@@ -123,29 +118,28 @@ def parser(text: str):
 
         # Riwāyāt units
         elif (il.startswith(t.RWY)):
-            # Set first line, skipping para marker "#""
+            # Set first line, skipping para marker "#"
+            document.add_content(Riwayat())
             first_line = parse_line(il[1:], i)
-            current_structure = Riwayat([first_line])
+            if first_line:
+                document.add_content(first_line)
 
         # Paragraphs and lines of verse
         elif (para_pattern.search(il)):
-            # Set first line, skipping para marker "#""
-            first_line = parse_line(il[1:], i)
             if (t.HEMI in il):
-                # this is a verse line
-                document.add_content(Verse(il, first_line))
+                # this is a verse line, skip para marker "#"
+                document.add_content(parse_line(il[1:], i, Verse))
             else:
-                current_structure = Paragraph([first_line])
-                document.add_content(current_structure)
+                document.add_content(Paragraph())
+                first_line = parse_line(il[1:], i)
+                if first_line:
+                    document.add_content(first_line)
 
-        # Paragraph or Riwāyāt unit lines
+        # Lines
         elif (il.startswith(t.LINE)):
-            if (isinstance(current_structure, Paragraph) or
-               isinstance(current_structure, Riwayat)):
-                current_structure.add_line(parse_line(il, i))
+            document.add_content(parse_line(il, i))
 
         # Editorial section
-        # TODO: this section contains paragraphs. Keeping as milestone for now.
         elif (il.startswith(t.EDITORIAL)):
             document.add_content(Editorial(il))
 
@@ -174,9 +168,6 @@ def parser(text: str):
             for tag in t.DICTIONARIES:
                 no_tag = no_tag.replace(tag, '')
             first_line = parse_line(no_tag, i)
-            # remove other phrase level tags
-            value = remove_phrase_lv_tags(no_tag)
-            # TODO: capture tags as PhraseParts
             dic_type = "bib"
             if (t.DIC_LEX in il):
                 dic_type = "lex"
@@ -184,8 +175,9 @@ def parser(text: str):
                 dic_type = "nis"
             elif (t.DIC_TOP in il):
                 dic_type = "top"
-            current_structure = DictionaryUnit(il, value, dic_type, [first_line])
-            document.add_content(current_structure)
+            document.add_content(DictionaryUnit(il, dic_type))
+            if first_line:
+                document.add_content(first_line)
 
         # Biographies and Events
         elif (bio_pattern.search(il) or il.startswith(t.BIO) or il.startswith(t.EVENT)):
@@ -193,8 +185,6 @@ def parser(text: str):
             for tag in t.BIOS_EVENTS:
                 no_tag = no_tag.replace(tag, '')
             first_line = parse_line(no_tag, i)
-            # remove other phrase level tags
-            value = remove_phrase_lv_tags(no_tag)
             be_type = "man"
             # Ordered from longer to shorter string to aid matching. I.e. ### $$$ before ### $$
             if (t.LIST_NAMES_FULL in il or t.LIST_NAMES in il):
@@ -207,21 +197,22 @@ def parser(text: str):
                 be_type = "events"
             elif (t.EVENT in il):
                 be_type = "event"
-            current_structure = BioOrEvent(il, value, be_type, [first_line])
-            document.add_content(current_structure)
+            document.add_content(BioOrEvent(il, be_type))
+            if first_line:
+                document.add_content(first_line)
 
         # Doxographical item
         elif (il.startswith(t.DOX)):
-            value = il
+            no_tag = il
             for tag in t.DOXOGRAPHICAL:
-                value = value.replace(tag, '')
-            # remove other phrase level tags
-            value = remove_phrase_lv_tags(value)
-            # TODO: capture tags as PhraseParts
+                no_tag = no_tag.replace(tag, '')
+            first_line = parse_line(no_tag, i)
             be_type = "pos"
             if (t.DOX_SEC in il):
                 dox_type = "sec"
-            document.add_content(DoxographicalItem(il, value, dox_type))
+            document.add_content(DoxographicalItem(il, dox_type))
+            if first_line:
+                document.add_content(first_line)
 
         # Morphological pattern
         elif (morpho_pattern.search(il)):
@@ -237,7 +228,6 @@ def parser(text: str):
             document.add_content(RouteOrDistance(il))
 
         else:
-            # Return current structure to document.
-            current_structure = document
+            continue
 
     return document

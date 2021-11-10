@@ -21,8 +21,8 @@ class SimpleMetadataField:
         return self.value
 
 
-class PhrasePart:
-    """A phrase-level tag"""
+class LinePart:
+    """A line-level tag"""
     def __init__(self, orig: str):
         self.orig = orig
 
@@ -30,11 +30,11 @@ class PhrasePart:
         return self.orig
 
 
-class TextPart(PhrasePart):
+class TextPart(LinePart):
     """Phrase-level text"""
 
 
-class NamedEntity(PhrasePart):
+class NamedEntity(LinePart):
     """A named entity"""
     def __init__(self, orig: str, value: str, ne_type: str):
         self.orig = orig
@@ -45,7 +45,7 @@ class NamedEntity(PhrasePart):
         return self.value
 
 
-class OpenTagUser(PhrasePart):
+class OpenTagUser(LinePart):
     """A custom tag added by a specific user"""
     def __init__(self, orig: str, value: str, user: str, t_type: str):
         self.orig = orig
@@ -57,7 +57,7 @@ class OpenTagUser(PhrasePart):
         return self.value
 
 
-class OpenTagAuto(PhrasePart):
+class OpenTagAuto(LinePart):
     """A custom tag added automatically"""
     def __init__(self, orig: str, value: str, resp: str,
                  t_type: str, category: str, review: str):
@@ -72,13 +72,13 @@ class OpenTagAuto(PhrasePart):
         return self.value
 
 
-class Milestone(PhrasePart):
+class Milestone(LinePart):
     """Milestone typically used for splitting text in 300-word blocks"""
     def __str__(self):
         return ""
 
 
-class RiwayatPart(PhrasePart):
+class RiwayatPart(LinePart):
     """Part of a riwāyaŧ unit"""
     def __init__(self, orig: str, value: str):
         self.orig = orig
@@ -101,8 +101,8 @@ class Hukm(RiwayatPart):
 
 
 class Line:
-    """A line of text, typically within a Content object"""
-    def __init__(self, orig: str, text_only: str, parts: List[PhrasePart] = None):
+    """A line of text that may contain parts"""
+    def __init__(self, orig: str, text_only: str, parts: List[LinePart] = None):
         self.orig = orig
         self.text_only = text_only
         if (parts is None):
@@ -110,7 +110,7 @@ class Line:
         else:
             self.parts = parts
 
-    def add_part(self, part: PhrasePart):
+    def add_part(self, part: LinePart):
         self.parts.append(part)
 
     def __str__(self):
@@ -118,7 +118,7 @@ class Line:
 
 
 class PageNumber():
-    """A page and volume number. Can be Content or PhraseLevel object"""
+    """A page and volume number. Can be Content or LinePart object"""
     def __init__(self, orig: str, vol: str, page: str):
         self.orig = orig
         self.page = page
@@ -137,28 +137,17 @@ class Content:
         return self.orig
 
 
-class Verse(Content):
+class Verse(Line):
     """A line of poetry"""
-    def __init__(self, orig: str, line: Line):
-        self.orig = orig
-        self.line = line
-
-    def __str__(self):
-        """returns the whole line without tags"""
-        return self.line
 
 
 class Paragraph(Content):
-    """A paragraph contaning a list of lines"""
-    def __init__(self, lines: List[Line]):
-        self.lines = lines
-
-    def add_line(self, line: Line):
-        self.lines.append(line)
+    """Marks the beginning of a paragraph"""
+    def __init__(self, orig = "#"):
+        self.orig = orig
 
     def __str__(self):
-        return "\n".join([str(l) for l in self.lines])
-
+        return ""
 
 class SectionHeader(Content):
     """A section header"""
@@ -180,28 +169,24 @@ class Editorial(Content):
         return ""
 
 
-class DictionaryUnit(Paragraph):
+class DictionaryUnit(Content):
     """Marks a dictionary unit"""
-    def __init__(self, orig: str, value: str, dic_type: str, lines: List[Line]):
+    def __init__(self, orig: str, dic_type: str):
         self.orig = orig
-        self.value = value
         self.dic_type = dic_type
-        self.lines = lines
 
     def __str__(self):
-        return self.value
+        return ""
 
 
-class BioOrEvent(Paragraph):
+class BioOrEvent(Content):
     """Marks a biography or an event"""
-    def __init__(self, orig: str, value: str, be_type: str, lines: List[Line]):
+    def __init__(self, orig: str, be_type: str):
         self.orig = orig
-        self.value = value
         self.be_type = be_type
-        self.lines = lines
 
     def __str__(self):
-        return self.value
+        return ""
 
 
 class DoxographicalItem(Content):
