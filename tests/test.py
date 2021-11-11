@@ -4,7 +4,7 @@ sys.path.append(
     os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 import unittest 
 import oimdp
-from oimdp.structures import BioOrEvent, DictionaryUnit, PageNumber, Paragraph
+from oimdp.structures import BioOrEvent, DictionaryUnit, DoxographicalItem, Editorial, PageNumber, Paragraph
 
 
 class TestStringMethods(unittest.TestCase):
@@ -80,6 +80,16 @@ class TestStringMethods(unittest.TestCase):
         check(38, "top")
         check(40, "lex")
         check(42, "bib")
+
+    def test_doxographical(self):
+        def check(location: int, type: str):
+            self.generic_check(DoxographicalItem, location, type, "dox_type")
+
+        check(44, "pos")
+        check(46, "sec")
+
+    def test_editorial(self):
+        self.assertTrue(isinstance(self.parsed.content[48], Editorial))
 
     # TODO: other tests.
 

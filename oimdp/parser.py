@@ -179,6 +179,19 @@ def parser(text: str):
             if first_line:
                 document.add_content(first_line)
 
+        # Doxographical item
+        elif (il.startswith(t.DOX)):
+            no_tag = il
+            for tag in t.DOXOGRAPHICAL:
+                no_tag = no_tag.replace(tag, '')
+            first_line = parse_line(no_tag, i)
+            dox_type = "pos"
+            if (t.DOX_SEC in il):
+                dox_type = "sec"
+            document.add_content(DoxographicalItem(il, dox_type))
+            if first_line:
+                document.add_content(first_line)
+
         # Biographies and Events
         elif (bio_pattern.search(il) or il.startswith(t.BIO) or il.startswith(t.EVENT)):
             no_tag = il
@@ -198,19 +211,6 @@ def parser(text: str):
             elif (t.EVENT in il):
                 be_type = "event"
             document.add_content(BioOrEvent(il, be_type))
-            if first_line:
-                document.add_content(first_line)
-
-        # Doxographical item
-        elif (il.startswith(t.DOX)):
-            no_tag = il
-            for tag in t.DOXOGRAPHICAL:
-                no_tag = no_tag.replace(tag, '')
-            first_line = parse_line(no_tag, i)
-            be_type = "pos"
-            if (t.DOX_SEC in il):
-                dox_type = "sec"
-            document.add_content(DoxographicalItem(il, dox_type))
             if first_line:
                 document.add_content(first_line)
 

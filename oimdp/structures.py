@@ -191,9 +191,8 @@ class BioOrEvent(Content):
 
 class DoxographicalItem(Content):
     """Marks a doxographical section"""
-    def __init__(self, orig: str, value: str, dox_type: str):
+    def __init__(self, orig: str, dox_type: str):
         self.orig = orig
-        self.value = value
         self.dox_type = dox_type
 
     def __str__(self):
