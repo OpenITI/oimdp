@@ -124,6 +124,11 @@ def parser(text: str):
             if first_line:
                 document.add_content(first_line)
 
+        # Morphological pattern
+        elif (morpho_pattern.search(il)):
+            m = morpho_pattern.search(il)
+            document.add_content(MorphologicalPattern(il, m.group(1)))
+
         # Paragraphs and lines of verse
         elif (para_pattern.search(il)):
             if (t.HEMI in il):
@@ -213,11 +218,6 @@ def parser(text: str):
             document.add_content(BioOrEvent(il, be_type))
             if first_line:
                 document.add_content(first_line)
-
-        # Morphological pattern
-        elif (morpho_pattern.search(il)):
-            m = morpho_pattern.search(il)
-            document.add_content(MorphologicalPattern(il, m.group(1)))
 
         # Regions
         elif (region_pattern.search(il)):

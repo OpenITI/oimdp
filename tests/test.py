@@ -4,7 +4,7 @@ sys.path.append(
     os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 import unittest 
 import oimdp
-from oimdp.structures import BioOrEvent, DictionaryUnit, DoxographicalItem, Editorial, PageNumber, Paragraph
+from oimdp.structures import BioOrEvent, DictionaryUnit, DoxographicalItem, Editorial, MorphologicalPattern, PageNumber, Paragraph
 
 
 class TestStringMethods(unittest.TestCase):
@@ -71,6 +71,7 @@ class TestStringMethods(unittest.TestCase):
             " -وفيها ولد: (@)(@@) المحدث عفيف ")
         check(32, "events")
         check(34, "event")
+        check(49, "man")
 
     def test_dictionary_unit(self):
         def check(location: int, type: str):
@@ -90,6 +91,10 @@ class TestStringMethods(unittest.TestCase):
 
     def test_editorial(self):
         self.assertTrue(isinstance(self.parsed.content[48], Editorial))
+
+    def test_morphological(self):
+        self.assertTrue(isinstance(self.parsed.content[50], MorphologicalPattern))
+        self.assertTrue(self.parsed.content[50].category, "onomastic")
 
     # TODO: other tests.
 
