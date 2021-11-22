@@ -1,6 +1,6 @@
 import sys
 import re
-from .structures import Document, PageNumber, Paragraph, Line, Verse, Milestone
+from .structures import Document, Hukm, Isnad, Matn, PageNumber, Paragraph, Line, Verse, Milestone
 from .structures import SectionHeader, Editorial, DictionaryUnit, BioOrEvent
 from .structures import DoxographicalItem, MorphologicalPattern, TextPart
 from .structures import AdministrativeRegion, RouteOrDistance, Riwayat
@@ -30,7 +30,7 @@ def remove_phrase_lv_tags(s: str):
     return text_only
 
 
-def parse_line(tagged_il: str, index: int, obj=Line):
+def parse_line(tagged_il: str, index: int, obj=Line, first_token=None):
     # remove line tag
     il = tagged_il.replace(t.LINE, '')
 
@@ -47,7 +47,11 @@ def parse_line(tagged_il: str, index: int, obj=Line):
     # to other tag systems.
 
     # Split the line by tags. Make sure patterns do not include subgroups!
-    tokens = re.split(rf"(PageV\d+P\d+|{t.MILESTONE})", il)
+    tokens = re.split(rf"(PageV\d+P\d+|{t.MILESTONE}{'|'.join(t.PHRASE_LV_TAGS)})", il)
+
+    # Some structures inject a token at the beginning of a line, like a riwāyaŧ's isnād
+    if first_token:
+        line.add_part(first_token(""))
 
     for token in tokens:
         if (t.PAGE in token):
@@ -60,6 +64,10 @@ def parse_line(tagged_il: str, index: int, obj=Line):
                 )
         elif (t.MILESTONE in token):
             line.add_part(Milestone(token))
+        elif (t.MATN in token):
+            line.add_part(Matn(token))
+        elif (t.HUKM in token):
+            line.add_part(Hukm(token))
         else:
             line.add_part(TextPart(token))
     return line
@@ -118,9 +126,9 @@ def parser(text: str):
 
         # Riwāyāt units
         elif (il.startswith(t.RWY)):
-            # Set first line, skipping para marker "#"
+            # Set first line, skipping para marker "# $RWY$"
             document.add_content(Riwayat())
-            first_line = parse_line(il[1:], i)
+            first_line = parse_line(il[7:], i, first_token=Isnad)
             if first_line:
                 document.add_content(first_line)
 

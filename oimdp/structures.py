@@ -77,26 +77,15 @@ class Milestone(LinePart):
     def __str__(self):
         return ""
 
-
-class RiwayatPart(LinePart):
-    """Part of a riwāyaŧ unit"""
-    def __init__(self, orig: str, value: str):
-        self.orig = orig
-        self.value = value
-
-    def __str__(self):
-        return self.value
-
-
-class Isnad(RiwayatPart):
+class Isnad(LinePart):
     """An isnād part of a riwāyaŧ unit"""
 
 
-class Matn(RiwayatPart):
+class Matn(LinePart):
     """A matn part of a riwāyaŧ unit"""
 
 
-class Hukm(RiwayatPart):
+class Hukm(LinePart):
     """A ḥukm part of a riwāyaŧ unit"""
 
 

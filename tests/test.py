@@ -4,7 +4,7 @@ sys.path.append(
     os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 import unittest 
 import oimdp
-from oimdp.structures import BioOrEvent, DictionaryUnit, DoxographicalItem, Editorial, MorphologicalPattern, PageNumber, Paragraph
+from oimdp.structures import BioOrEvent, DictionaryUnit, DoxographicalItem, Editorial, Hukm, Isnad, Line, Matn, MorphologicalPattern, PageNumber, Paragraph, Riwayat, TextPart
 
 
 class TestStringMethods(unittest.TestCase):
@@ -95,6 +95,35 @@ class TestStringMethods(unittest.TestCase):
     def test_morphological(self):
         self.assertTrue(isinstance(self.parsed.content[50], MorphologicalPattern))
         self.assertTrue(self.parsed.content[50].category, "onomastic")
+    
+    def test_paragraph(self):
+        self.assertTrue(isinstance(self.parsed.content[51], Paragraph))
+
+    def test_line(self):
+        self.assertTrue(isinstance(self.parsed.content[52], Line))
+        self.assertTrue(isinstance(self.parsed.content[53], Line))
+        ## Check line parts on 53
+
+    def test_riwayat(self):
+        self.assertTrue(isinstance(self.parsed.content[54], Riwayat))
+        self.assertTrue(isinstance(self.parsed.content[55], Line))
+        self.assertTrue(isinstance(self.parsed.content[55].parts[0], Isnad))
+        self.assertTrue(isinstance(self.parsed.content[55].parts[1], TextPart))
+        self.assertEqual(self.parsed.content[55].parts[1].orig, " this section contains isnād ")
+        
+        self.assertTrue(isinstance(self.parsed.content[55].parts[2], Matn))
+        self.assertTrue(isinstance(self.parsed.content[55].parts[3], TextPart))
+        self.assertEqual(self.parsed.content[55].parts[3].orig, " this section")
+
+        self.assertTrue(isinstance(self.parsed.content[56], Line))
+        self.assertTrue(isinstance(self.parsed.content[56].parts[0], TextPart))
+        self.assertEqual(self.parsed.content[56].parts[0].orig, " contains matn ")
+
+        self.assertTrue(isinstance(self.parsed.content[56].parts[1], Hukm))
+        self.assertTrue(isinstance(self.parsed.content[56].parts[2], TextPart))
+        self.assertEqual(self.parsed.content[56].parts[2].orig, " this section contains ḥukm .")
+        
+
 
     # TODO: other tests.
 
