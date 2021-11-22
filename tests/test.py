@@ -4,7 +4,7 @@ sys.path.append(
     os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 import unittest 
 import oimdp
-from oimdp.structures import BioOrEvent, DictionaryUnit, DoxographicalItem, Editorial, Hukm, Isnad, Line, Matn, MorphologicalPattern, PageNumber, Paragraph, Riwayat, TextPart
+from oimdp.structures import BioOrEvent, DictionaryUnit, DoxographicalItem, Editorial, Hukm, Isnad, Line, Matn, MorphologicalPattern, PageNumber, Paragraph, Riwayat, RouteDist, RouteFrom, RouteOrDistance, RouteTowa, TextPart
 
 
 class TestStringMethods(unittest.TestCase):
@@ -122,7 +122,20 @@ class TestStringMethods(unittest.TestCase):
         self.assertTrue(isinstance(self.parsed.content[56].parts[1], Hukm))
         self.assertTrue(isinstance(self.parsed.content[56].parts[2], TextPart))
         self.assertEqual(self.parsed.content[56].parts[2].orig, " this section contains ḥukm .")
-        
+
+    def test_route_or_distance(self):
+        self.assertTrue(isinstance(self.parsed.content[57], RouteOrDistance))
+        self.assertTrue(isinstance(self.parsed.content[57].parts[0], RouteFrom))
+        self.assertTrue(isinstance(self.parsed.content[57].parts[1], TextPart))
+        self.assertEqual(self.parsed.content[57].parts[1].orig, " toponym ")
+
+        self.assertTrue(isinstance(self.parsed.content[57].parts[2], RouteTowa))
+        self.assertTrue(isinstance(self.parsed.content[57].parts[3], TextPart))
+        self.assertEqual(self.parsed.content[57].parts[3].orig, " toponym ")
+
+        self.assertTrue(isinstance(self.parsed.content[57].parts[4], RouteDist))
+        self.assertTrue(isinstance(self.parsed.content[57].parts[5], TextPart))
+        self.assertEqual(self.parsed.content[57].parts[5].orig, " distance_as_recorded")
 
 
     # TODO: other tests.

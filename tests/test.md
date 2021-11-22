@@ -84,6 +84,7 @@ PageV00P030
 ~~ الصوفي YD597@ نزيل: 1"018: واسط.. شيخ: معمر
 # $RWY$ this section contains isnād @MATN@ this section
 ~~ contains matn @HUKM@ this section contains ḥukm .
+#$#FROM toponym #$#TOWA toponym #$#DIST distance_as_recorded
 # المؤلف: عبد الملك بن هشام بن أيوب الحميري المعافري، أبو محمد، جمال
 ~~الدين (المتوفى: 213ه)
 # تحقيق: مصطفى السقا وإبراهيم الأبياري وعبد الحفيظ الشلبي

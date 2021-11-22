@@ -77,6 +77,7 @@ class Milestone(LinePart):
     def __str__(self):
         return ""
 
+
 class Isnad(LinePart):
     """An isnād part of a riwāyaŧ unit"""
 
@@ -206,12 +207,20 @@ class AdministrativeRegion(Content):
         return ""
 
 
-class RouteOrDistance(Content):
+class RouteOrDistance(Line):
     """A route or distance"""
-    # TODO
 
-    def __str__(self):
-        return ""
+
+class RouteFrom(LinePart):
+    """Origin of a Route"""
+
+
+class RouteTowa(LinePart):
+    """Destination of a Route"""
+
+
+class RouteDist(LinePart):
+    """Distance of a Route"""
 
 
 class Riwayat(Paragraph):

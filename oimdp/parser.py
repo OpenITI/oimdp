@@ -1,6 +1,6 @@
 import sys
 import re
-from .structures import Document, Hukm, Isnad, Matn, PageNumber, Paragraph, Line, Verse, Milestone
+from .structures import Document, Hukm, Isnad, Matn, PageNumber, Paragraph, Line, RouteDist, RouteFrom, RouteTowa, Verse, Milestone
 from .structures import SectionHeader, Editorial, DictionaryUnit, BioOrEvent
 from .structures import DoxographicalItem, MorphologicalPattern, TextPart
 from .structures import AdministrativeRegion, RouteOrDistance, Riwayat
@@ -43,17 +43,17 @@ def parse_line(tagged_il: str, index: int, obj=Line, first_token=None):
 
     line = obj(il, text_only)
 
-    # TODO: deal with line parts, which is needed to support conversion
-    # to other tag systems.
-
     # Split the line by tags. Make sure patterns do not include subgroups!
-    tokens = re.split(rf"(PageV\d+P\d+|{t.MILESTONE}{'|'.join(t.PHRASE_LV_TAGS)})", il)
+    tokens = re.split(rf"(PageV\d+P\d+|{t.MILESTONE}{'|'.join([re.escape(t) for t in t.PHRASE_LV_TAGS])})", il)
 
     # Some structures inject a token at the beginning of a line, like a riwāyaŧ's isnād
     if first_token:
         line.add_part(first_token(""))
 
     for token in tokens:
+        if token == '':
+            continue
+        
         if (t.PAGE in token):
             m = PAGE_PATTERN.search(token)
             try:
@@ -68,6 +68,12 @@ def parse_line(tagged_il: str, index: int, obj=Line, first_token=None):
             line.add_part(Matn(token))
         elif (t.HUKM in token):
             line.add_part(Hukm(token))
+        elif (t.ROUTE_FROM in token):
+            line.add_part(RouteFrom(token))
+        elif (t.ROUTE_TOWA in token):
+            line.add_part(RouteTowa(token))
+        elif (t.ROUTE_DIST in token):
+            line.add_part(RouteDist(token))
         else:
             line.add_part(TextPart(token))
     return line
@@ -96,9 +102,6 @@ def parser(text: str):
     morpho_pattern = re.compile(r"#~:([^:]+?):")
     region_pattern = re.compile(
         rf"({t.PROV}|{t.REG}\d) .*? {t.GEO_TYPE} .*? ({t.REG}\d|{t.STTL}) ([\w# ]+) $"
-    )
-    route_pattern = re.compile(
-        rf"{t.DIST_FROM} .*? {t.DIST_TO} .*? {t.DIST} .*"
     )
 
     # Input lines loop
@@ -131,6 +134,10 @@ def parser(text: str):
             first_line = parse_line(il[7:], i, first_token=Isnad)
             if first_line:
                 document.add_content(first_line)
+
+        # Routes
+        elif (il.startswith(t.ROUTE_FROM)):
+            document.add_content(parse_line(il, i, RouteOrDistance))
 
         # Morphological pattern
         elif (morpho_pattern.search(il)):
@@ -230,10 +237,6 @@ def parser(text: str):
         # Regions
         elif (region_pattern.search(il)):
             document.add_content(AdministrativeRegion(il))
-
-        # Routes
-        elif (route_pattern.search(il)):
-            document.add_content(RouteOrDistance(il))
 
         else:
             continue
