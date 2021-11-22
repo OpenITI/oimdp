@@ -158,6 +158,9 @@ class TestStringMethods(unittest.TestCase):
         self.assertEqual(self.parsed.content[62].value, " (نهج ابن هشام في هذا الكتاب) :")
         self.assertEqual(self.parsed.content[62].level, 5)
 
+    # def test_verse(self):
+    #     print(self.parsed.content[63])
+
     # TODO: other tests.
 
     # def test_clean_text(self):

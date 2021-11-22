@@ -53,7 +53,7 @@ def parse_line(tagged_il: str, index: int, obj=Line, first_token=None):
     for token in tokens:
         if token == '':
             continue
-        
+
         if (t.PAGE in token):
             m = PAGE_PATTERN.search(token)
             try:
@@ -172,14 +172,15 @@ def parser(text: str):
             value = remove_phrase_lv_tags(value)
             # TODO: capture tags as PhraseParts
             level = 1
-            if (t.HEADER2 in il):
-                level = 2
-            elif (t.HEADER3 in il):
-                level = 3
+            if (t.HEADER5 in il):
+                level = 5
             elif (t.HEADER4 in il):
                 level = 4
-            elif (t.HEADER5 in il):
-                level = 5
+            elif (t.HEADER3 in il):
+                level = 3
+            elif (t.HEADER2 in il):
+                level = 2
+            
             document.add_content(SectionHeader(il, value, level))
 
         # Dictionary entry
