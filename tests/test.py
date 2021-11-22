@@ -4,7 +4,7 @@ sys.path.append(
     os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 import unittest 
 import oimdp
-from oimdp.structures import BioOrEvent, DictionaryUnit, DoxographicalItem, Editorial, Hukm, Isnad, Line, Matn, MorphologicalPattern, PageNumber, Paragraph, Riwayat, RouteDist, RouteFrom, RouteOrDistance, RouteTowa, SectionHeader, TextPart
+from oimdp.structures import BioOrEvent, DictionaryUnit, DoxographicalItem, Editorial, Hemistich, Hukm, Isnad, Line, Matn, MorphologicalPattern, PageNumber, Paragraph, Riwayat, RouteDist, RouteFrom, RouteOrDistance, RouteTowa, SectionHeader, TextPart, Verse
 
 
 class TestStringMethods(unittest.TestCase):
@@ -158,8 +158,30 @@ class TestStringMethods(unittest.TestCase):
         self.assertEqual(self.parsed.content[62].value, " (نهج ابن هشام في هذا الكتاب) :")
         self.assertEqual(self.parsed.content[62].level, 5)
 
-    # def test_verse(self):
-    #     print(self.parsed.content[63])
+    def test_verse(self):
+        self.assertTrue(isinstance(self.parsed.content[63], Verse))
+        self.assertTrue(isinstance(self.parsed.content[63].parts[0], TextPart))
+        self.assertEqual(self.parsed.content[63].parts[0].orig, " وجمع العرب تحت لواء الرسول محمد عليه الصلاة ")
+
+        self.assertTrue(isinstance(self.parsed.content[63].parts[1], Hemistich))
+        self.assertEqual(self.parsed.content[63].parts[1].orig, "%~%")
+
+        self.assertTrue(isinstance(self.parsed.content[63].parts[2], TextPart))
+        self.assertEqual(self.parsed.content[63].parts[2].orig, " والسلام، وما يضاف إلى ذلك من")
+
+        self.assertTrue(isinstance(self.parsed.content[64], Verse))
+        self.assertTrue(isinstance(self.parsed.content[64].parts[0], TextPart))
+        self.assertEqual(self.parsed.content[64].parts[0].orig, " ")
+        self.assertTrue(isinstance(self.parsed.content[64].parts[1], Hemistich))
+        self.assertEqual(self.parsed.content[64].parts[1].orig, "%~%")
+        self.assertTrue(isinstance(self.parsed.content[64].parts[2], TextPart))
+        self.assertEqual(self.parsed.content[64].parts[2].orig, " وجمع العرب تحت لواء الرسول محمد عليه الصلاة  والسلام، وما يضاف إلى ذلك من")
+
+        self.assertTrue(isinstance(self.parsed.content[65], Verse))
+        self.assertTrue(isinstance(self.parsed.content[65].parts[1], Hemistich))
+        self.assertEqual(self.parsed.content[65].parts[1].orig, "%~%")
+        self.assertTrue(isinstance(self.parsed.content[65].parts[0], TextPart))
+        self.assertEqual(self.parsed.content[65].parts[0].orig, " جمع العرب تحت لواء الرسول محمد عليه الصلاة  والسلام، وما يضاف إلى ذلك من")
 
     # TODO: other tests.
 

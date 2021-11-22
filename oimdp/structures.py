@@ -130,6 +130,9 @@ class Content:
 class Verse(Line):
     """A line of poetry"""
 
+class Hemistich(LinePart):
+    """Tags the beginning of a hemistic in a verse"""
+
 
 class Paragraph(Content):
     """Marks the beginning of a paragraph"""

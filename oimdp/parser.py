@@ -1,6 +1,6 @@
 import sys
 import re
-from .structures import Document, Hukm, Isnad, Matn, PageNumber, Paragraph, Line, RouteDist, RouteFrom, RouteTowa, Verse, Milestone
+from .structures import Document, Hemistich, Hukm, Isnad, Matn, PageNumber, Paragraph, Line, RouteDist, RouteFrom, RouteTowa, Verse, Milestone
 from .structures import SectionHeader, Editorial, DictionaryUnit, BioOrEvent
 from .structures import DoxographicalItem, MorphologicalPattern, TextPart
 from .structures import AdministrativeRegion, RouteOrDistance, Riwayat
@@ -44,7 +44,7 @@ def parse_line(tagged_il: str, index: int, obj=Line, first_token=None):
     line = obj(il, text_only)
 
     # Split the line by tags. Make sure patterns do not include subgroups!
-    tokens = re.split(rf"(PageV\d+P\d+|{t.MILESTONE}{'|'.join([re.escape(t) for t in t.PHRASE_LV_TAGS])})", il)
+    tokens = re.split(rf"(PageV\d+P\d+|{t.MILESTONE}|{'|'.join([re.escape(t) for t in t.PHRASE_LV_TAGS])})", il)
 
     # Some structures inject a token at the beginning of a line, like a riwāyaŧ's isnād
     if first_token:
@@ -62,6 +62,8 @@ def parse_line(tagged_il: str, index: int, obj=Line, first_token=None):
                 raise Exception(
                     'Could not parse page number at line: ' + str(index+1)
                 )
+        elif (t.HEMI in token):
+            line.add_part(Hemistich(token))
         elif (t.MILESTONE in token):
             line.add_part(Milestone(token))
         elif (t.MATN in token):
