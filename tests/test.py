@@ -4,7 +4,7 @@ sys.path.append(
     os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 import unittest 
 import oimdp
-from oimdp.structures import BioOrEvent, DictionaryUnit, DoxographicalItem, Editorial, Hukm, Isnad, Line, Matn, MorphologicalPattern, PageNumber, Paragraph, Riwayat, RouteDist, RouteFrom, RouteOrDistance, RouteTowa, TextPart
+from oimdp.structures import BioOrEvent, DictionaryUnit, DoxographicalItem, Editorial, Hukm, Isnad, Line, Matn, MorphologicalPattern, PageNumber, Paragraph, Riwayat, RouteDist, RouteFrom, RouteOrDistance, RouteTowa, SectionHeader, TextPart
 
 
 class TestStringMethods(unittest.TestCase):
@@ -137,6 +137,26 @@ class TestStringMethods(unittest.TestCase):
         self.assertTrue(isinstance(self.parsed.content[57].parts[5], TextPart))
         self.assertEqual(self.parsed.content[57].parts[5].orig, " distance_as_recorded")
 
+    def test_section_headers(self):
+        self.assertTrue(isinstance(self.parsed.content[58], SectionHeader))
+        self.assertEqual(self.parsed.content[58].value, " ذكر سرد النسب الزكي من محمد صلى الله عليه وآله وسلم، إلى آدم عليه السلام")
+        self.assertEqual(self.parsed.content[58].level, 1)
+
+        self.assertTrue(isinstance(self.parsed.content[59], SectionHeader))
+        self.assertEqual(self.parsed.content[59].value, " (نهج ابن هشام في هذا الكتاب) :")
+        self.assertEqual(self.parsed.content[59].level, 2)
+
+        self.assertTrue(isinstance(self.parsed.content[60], SectionHeader))
+        self.assertEqual(self.parsed.content[60].value, " (نهج ابن هشام في هذا الكتاب) :")
+        self.assertEqual(self.parsed.content[60].level, 3)
+
+        self.assertTrue(isinstance(self.parsed.content[61], SectionHeader))
+        self.assertEqual(self.parsed.content[61].value, " (نهج ابن هشام في هذا الكتاب) :")
+        self.assertEqual(self.parsed.content[61].level, 4)
+
+        self.assertTrue(isinstance(self.parsed.content[62], SectionHeader))
+        self.assertEqual(self.parsed.content[62].value, " (نهج ابن هشام في هذا الكتاب) :")
+        self.assertEqual(self.parsed.content[62].level, 5)
 
     # TODO: other tests.
 
