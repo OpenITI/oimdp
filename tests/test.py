@@ -4,7 +4,7 @@ sys.path.append(
     os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 import unittest 
 import oimdp
-from oimdp.structures import BioOrEvent, DictionaryUnit, DoxographicalItem, Editorial, Hemistich, Hukm, Isnad, Line, Matn, MorphologicalPattern, PageNumber, Paragraph, Riwayat, RouteDist, RouteFrom, RouteOrDistance, RouteTowa, SectionHeader, TextPart, Verse
+from oimdp.structures import BioOrEvent, DictionaryUnit, Document, DoxographicalItem, Editorial, Hemistich, Hukm, Isnad, Line, Matn, Milestone, MorphologicalPattern, PageNumber, Paragraph, Riwayat, RouteDist, RouteFrom, RouteOrDistance, RouteTowa, SectionHeader, TextPart, Verse
 
 
 class TestStringMethods(unittest.TestCase):
@@ -34,6 +34,9 @@ class TestStringMethods(unittest.TestCase):
                          "000.SortField	:: Shamela_0023833")
         self.assertEqual(str(self.parsed.simple_metadata[-1]),
                          "999.MiscINFO	:: NODATA")
+
+    def test_document(self):
+        self.assertTrue(isinstance(self.parsed, Document))
 
     def test_page(self):
         self.assertTrue(isinstance(self.parsed.content[1].parts[1], 
@@ -103,6 +106,14 @@ class TestStringMethods(unittest.TestCase):
         self.assertTrue(isinstance(self.parsed.content[52], Line))
         self.assertTrue(isinstance(self.parsed.content[53], Line))
         ## Check line parts on 53
+
+    def test_milestone(self):
+        self.assertTrue(isinstance(self.parsed.content[67], Line))
+        self.assertTrue(isinstance(self.parsed.content[67].parts[1], Milestone))
+
+    # def test_named_entities(self):
+    #     self.assertTrue(isinstance(self.parsed.content[67], Line))
+    #     self.assertTrue(isinstance(self.parsed.content[67].parts[1], Milestone))
 
     def test_riwayat(self):
         self.assertTrue(isinstance(self.parsed.content[54], Riwayat))
