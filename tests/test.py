@@ -124,6 +124,28 @@ class TestStringMethods(unittest.TestCase):
         self.assertTrue(isinstance(self.parsed.content[70].parts[1], NamedEntity))
         self.assertEqual(self.parsed.content[70].parts[1].ne_type, "age")
 
+        self.assertTrue(isinstance(self.parsed.content[71].parts[1], NamedEntity))
+        self.assertEqual(self.parsed.content[71].parts[1].ne_type, "soc")
+
+        self.assertTrue(isinstance(self.parsed.content[72].parts[1], NamedEntity))
+        self.assertEqual(self.parsed.content[72].parts[1].ne_type, "soc")
+
+        self.assertTrue(isinstance(self.parsed.content[73].parts[1], NamedEntity))
+        self.assertEqual(self.parsed.content[73].parts[1].ne_type, "top")
+
+        self.assertTrue(isinstance(self.parsed.content[74].parts[1], NamedEntity))
+        self.assertEqual(self.parsed.content[74].parts[1].ne_type, "top")
+
+        self.assertTrue(isinstance(self.parsed.content[75].parts[1], NamedEntity))
+        self.assertEqual(self.parsed.content[75].parts[1].ne_type, "per")
+
+        self.assertTrue(isinstance(self.parsed.content[76].parts[1], NamedEntity))
+        self.assertEqual(self.parsed.content[76].parts[1].ne_type, "per")
+
+        self.assertTrue(isinstance(self.parsed.content[77].parts[1], NamedEntity))
+        self.assertEqual(self.parsed.content[77].parts[1].ne_type, "src")
+
+
     def test_riwayat(self):
         self.assertTrue(isinstance(self.parsed.content[54], Riwayat))
         self.assertTrue(isinstance(self.parsed.content[55], Line))

@@ -14,9 +14,10 @@ OPEN_TAG_AUTO_PATTERN = re.compile(
     r"@([A-Z]{3})@([A-Z]{3,})@([A-Za-z])@(-@([0tf][ftalmr])@)?"
 )
 YEAR_PATTERN = [rf"{t.YEAR_AGE}\d{{1,4}}", rf"{t.YEAR_DEATH}\d{{1,4}}", rf"{t.YEAR_BIRTH}\d{{1,4}}", rf"{t.YEAR_OTHER}\d{{1,4}}"]
-TOP_PATTERN = [rf"{t.TOP}\d{{1,2}}", rf"{t.TOP_FULL}\d{{1,2}}"]
-PER_PATTERN = [rf"{t.PER}\d{{1,2}}", rf"{t.PER_FULL}\d{{1,2}}"]
-NAMED_ENTITIES_PATTERN = [*YEAR_PATTERN, *TOP_PATTERN, *PER_PATTERN, rf"{t.SRC}\d{{1,2}}"]
+TOP_PATTERN = [rf"{t.TOP_FULL}\d{{1,2}}", rf"{t.TOP}\d{{1,2}}"]
+PER_PATTERN = [rf"{t.PER_FULL}\d{{1,2}}", rf"{t.PER}\d{{1,2}}"]
+SOC_PATTERN = [rf"{t.SOC_FULL}\d{{1,2}}", rf"{t.SOC}\d{{1,2}}"]
+NAMED_ENTITIES_PATTERN = [*YEAR_PATTERN, *TOP_PATTERN, *PER_PATTERN, rf"{t.SRC}\d{{1,2}}", *SOC_PATTERN]
 
 
 def parse_tags(s: str):
@@ -88,6 +89,14 @@ def parse_line(tagged_il: str, index: int, obj=Line, first_token=None):
             line.add_part(NamedEntity(token, 'age'))
         elif t.YEAR_OTHER in token:
             line.add_part(NamedEntity(token, 'other'))
+        elif t.SRC in token:
+            line.add_part(NamedEntity(token, 'src'))
+        elif t.SOC in token or t.SOC_FULL in token:
+            line.add_part(NamedEntity(token, 'soc'))
+        elif t.TOP in token or t.TOP_FULL in token:
+            line.add_part(NamedEntity(token, 'top'))
+        elif t.PER in token or t.PER_FULL in token:
+            line.add_part(NamedEntity(token, 'per'))
         else:
             line.add_part(TextPart(token))
     return line
