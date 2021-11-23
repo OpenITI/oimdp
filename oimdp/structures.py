@@ -165,7 +165,7 @@ class DictionaryUnit(Content):
     """Marks a dictionary unit"""
     def __init__(self, orig: str, dic_type: str):
         self.orig = orig
-        self.dic_type = dic_type
+        self.dic_type: Literal["nit", "top", "lex", "bib"] = dic_type
 
     def __str__(self):
         return ""
@@ -175,7 +175,7 @@ class BioOrEvent(Content):
     """Marks a biography or an event"""
     def __init__(self, orig: str, be_type: str):
         self.orig = orig
-        self.be_type = be_type
+        self.be_type: Literal["man", "wom", "ref", "names", "event", "events"] = be_type
 
     def __str__(self):
         return ""
@@ -185,7 +185,7 @@ class DoxographicalItem(Content):
     """Marks a doxographical section"""
     def __init__(self, orig: str, dox_type: str):
         self.orig = orig
-        self.dox_type = dox_type
+        self.dox_type: Literal["pos", "sec"] = dox_type
 
     def __str__(self):
         return self.value
