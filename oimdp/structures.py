@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Literal
 
 
 class MagicValue:
@@ -36,10 +36,9 @@ class TextPart(LinePart):
 
 class NamedEntity(LinePart):
     """A named entity"""
-    def __init__(self, orig: str, value: str, ne_type: str):
+    def __init__(self, orig: str, ne_type: str):
         self.orig = orig
-        self.value = value
-        self.ne_type = ne_type
+        self.ne_type: Literal["birth", "death", "age", "other"] = ne_type
 
     def __str__(self):
         return self.value

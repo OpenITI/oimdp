@@ -81,7 +81,7 @@ PageV00P030
 ### $BIO_MAN$
 #~:onomastic:
 # حمد بن علي بن: سعيدء. أبو: العباس الخوزي
-~~ الصوفي YD597@ نزيل: 1"018: واسط.. شيخ: معمر
+~~ الصوفي @YD597 نزيل: 1"018: واسط.. شيخ: معمر
 # $RWY$ this section contains isnād @MATN@ this section
 ~~ contains matn @HUKM@ this section contains ḥukm .
 #$#FROM toponym #$#TOWA toponym #$#DIST distance_as_recorded

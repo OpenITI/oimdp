@@ -4,7 +4,7 @@ sys.path.append(
     os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 import unittest 
 import oimdp
-from oimdp.structures import BioOrEvent, DictionaryUnit, Document, DoxographicalItem, Editorial, Hemistich, Hukm, Isnad, Line, Matn, Milestone, MorphologicalPattern, PageNumber, Paragraph, Riwayat, RouteDist, RouteFrom, RouteOrDistance, RouteTowa, SectionHeader, TextPart, Verse
+from oimdp.structures import BioOrEvent, DictionaryUnit, Document, DoxographicalItem, Editorial, Hemistich, Hukm, Isnad, Line, Matn, Milestone, MorphologicalPattern, NamedEntity, PageNumber, Paragraph, Riwayat, RouteDist, RouteFrom, RouteOrDistance, RouteTowa, SectionHeader, TextPart, Verse
 
 
 class TestStringMethods(unittest.TestCase):
@@ -111,9 +111,9 @@ class TestStringMethods(unittest.TestCase):
         self.assertTrue(isinstance(self.parsed.content[67], Line))
         self.assertTrue(isinstance(self.parsed.content[67].parts[1], Milestone))
 
-    # def test_named_entities(self):
-    #     self.assertTrue(isinstance(self.parsed.content[67], Line))
-    #     self.assertTrue(isinstance(self.parsed.content[67].parts[1], Milestone))
+    def test_named_entities(self):
+        self.assertTrue(isinstance(self.parsed.content[53].parts[1], NamedEntity))
+        self.assertEqual(self.parsed.content[53].parts[1].ne_type, "death")
 
     def test_riwayat(self):
         self.assertTrue(isinstance(self.parsed.content[54], Riwayat))

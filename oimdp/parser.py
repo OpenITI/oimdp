@@ -1,6 +1,6 @@
 import sys
 import re
-from .structures import Document, Hemistich, Hukm, Isnad, Matn, PageNumber, Paragraph, Line, RouteDist, RouteFrom, RouteTowa, Verse, Milestone
+from .structures import Document, Hemistich, Hukm, Isnad, Matn, NamedEntity, PageNumber, Paragraph, Line, RouteDist, RouteFrom, RouteTowa, Verse, Milestone
 from .structures import SectionHeader, Editorial, DictionaryUnit, BioOrEvent
 from .structures import DoxographicalItem, MorphologicalPattern, TextPart
 from .structures import AdministrativeRegion, RouteOrDistance, Riwayat
@@ -13,6 +13,10 @@ OPEN_TAG_CUSTOM_PATTERN = re.compile(
 OPEN_TAG_AUTO_PATTERN = re.compile(
     r"@([A-Z]{3})@([A-Z]{3,})@([A-Za-z])@(-@([0tf][ftalmr])@)?"
 )
+YEAR_PATTERN = [rf"{t.YEAR_AGE}\d{{1,4}}", rf"{t.YEAR_DEATH}\d{{1,4}}", rf"{t.YEAR_BIRTH}\d{{1,4}}", rf"{t.YEAR_OTHER}\d{{1,4}}"]
+TOP_PATTERN = [rf"{t.TOP}\d{{1,2}}", rf"{t.TOP_FULL}\d{{1,2}}"]
+PER_PATTERN = [rf"{t.PER}\d{{1,2}}", rf"{t.PER_FULL}\d{{1,2}}"]
+NAMED_ENTITIES_PATTERN = [*YEAR_PATTERN, *TOP_PATTERN, *PER_PATTERN, rf"{t.SRC}\d{{1,2}}"]
 
 
 def parse_tags(s: str):
@@ -44,7 +48,7 @@ def parse_line(tagged_il: str, index: int, obj=Line, first_token=None):
     line = obj(il, text_only)
 
     # Split the line by tags. Make sure patterns do not include subgroups!
-    tokens = re.split(rf"(PageV\d+P\d+|{t.MILESTONE}|{'|'.join([re.escape(t) for t in t.PHRASE_LV_TAGS])})", il)
+    tokens = re.split(rf"(PageV\d+P\d+|{t.MILESTONE}|{'|'.join([re.escape(t) for t in t.PHRASE_LV_TAGS])}|{'|'.join([t for t in NAMED_ENTITIES_PATTERN])})", il)
 
     # Some structures inject a token at the beginning of a line, like a riwāyaŧ's isnād
     if first_token:
@@ -62,20 +66,28 @@ def parse_line(tagged_il: str, index: int, obj=Line, first_token=None):
                 raise Exception(
                     'Could not parse page number at line: ' + str(index+1)
                 )
-        elif (t.HEMI in token):
+        elif t.HEMI in token:
             line.add_part(Hemistich(token))
-        elif (t.MILESTONE in token):
+        elif t.MILESTONE in token:
             line.add_part(Milestone(token))
-        elif (t.MATN in token):
+        elif t.MATN in token:
             line.add_part(Matn(token))
-        elif (t.HUKM in token):
+        elif t.HUKM in token:
             line.add_part(Hukm(token))
-        elif (t.ROUTE_FROM in token):
+        elif t.ROUTE_FROM in token:
             line.add_part(RouteFrom(token))
-        elif (t.ROUTE_TOWA in token):
+        elif t.ROUTE_TOWA in token:
             line.add_part(RouteTowa(token))
-        elif (t.ROUTE_DIST in token):
+        elif t.ROUTE_DIST in token:
             line.add_part(RouteDist(token))
+        elif t.YEAR_BIRTH in token:
+            line.add_part(NamedEntity(token, 'birth'))
+        elif t.YEAR_DEATH in token:
+            line.add_part(NamedEntity(token, 'death'))
+        elif t.YEAR_AGE in token:
+            line.add_part(NamedEntity(token, 'age'))
+        elif t.YEAR_OTHER in token:
+            line.add_part(NamedEntity(token, 'other'))
         else:
             line.add_part(TextPart(token))
     return line
