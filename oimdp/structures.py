@@ -46,11 +46,12 @@ class NamedEntity(LinePart):
 
 class OpenTagUser(LinePart):
     """A custom tag added by a specific user"""
-    def __init__(self, orig: str, value: str, user: str, t_type: str):
+    def __init__(self, orig: str, user: str, t_type: str, t_subtype: str, t_subsubtype: str):
         self.orig = orig
-        self.value = value
         self.user = user
         self.t_type = t_type
+        self.t_subtype = t_subtype
+        self.t_subsubtype = t_subsubtype
 
     def __str__(self):
         return self.value

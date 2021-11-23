@@ -1,13 +1,14 @@
 import sys
 import re
-from .structures import Document, Hemistich, Hukm, Isnad, Matn, NamedEntity, PageNumber, Paragraph, Line, RouteDist, RouteFrom, RouteTowa, Verse, Milestone
+from .structures import Document, Hemistich, Hukm, Isnad, Matn, NamedEntity, OpenTagUser, PageNumber, Paragraph, Line, RouteDist, RouteFrom, RouteTowa, Verse, Milestone
 from .structures import SectionHeader, Editorial, DictionaryUnit, BioOrEvent
 from .structures import DoxographicalItem, MorphologicalPattern, TextPart
 from .structures import AdministrativeRegion, RouteOrDistance, Riwayat
 from . import tags as t
 
 PAGE_PATTERN = re.compile(r"PageV(\d+)P(\d+)")
-OPEN_TAG_CUSTOM_PATTERN = re.compile(
+OPEN_TAG_CUSTOM_PATTERN = r"@[^@]+?@[^_@]+?_[^_@]+?(?:_[^_@]+?)?@"
+OPEN_TAG_CUSTOM_PATTERN_GROUPED = re.compile(
     r"@([^@]+?)@([^_@]+?)_([^_@]+?)(_([^_@]+?))?@"
 )
 OPEN_TAG_AUTO_PATTERN = re.compile(
@@ -29,7 +30,7 @@ def remove_phrase_lv_tags(s: str):
     for tag in t.PHRASE_LV_TAGS:
         text_only = text_only.replace(tag, '')
     # Open tag
-    text_only = OPEN_TAG_CUSTOM_PATTERN.sub('', text_only)
+    text_only = OPEN_TAG_CUSTOM_PATTERN_GROUPED.sub('', text_only)
     text_only = OPEN_TAG_AUTO_PATTERN.sub('', text_only)
     text_only = PAGE_PATTERN.sub('', text_only)
     return text_only
@@ -49,7 +50,7 @@ def parse_line(tagged_il: str, index: int, obj=Line, first_token=None):
     line = obj(il, text_only)
 
     # Split the line by tags. Make sure patterns do not include subgroups!
-    tokens = re.split(rf"(PageV\d+P\d+|{t.MILESTONE}|{'|'.join([re.escape(t) for t in t.PHRASE_LV_TAGS])}|{'|'.join([t for t in NAMED_ENTITIES_PATTERN])})", il)
+    tokens = re.split(rf"(PageV\d+P\d+|{t.MILESTONE}|{OPEN_TAG_CUSTOM_PATTERN}|{'|'.join([re.escape(t) for t in t.PHRASE_LV_TAGS])}|{'|'.join([t for t in NAMED_ENTITIES_PATTERN])})", il)
 
     # Some structures inject a token at the beginning of a line, like a riwāyaŧ's isnād
     if first_token:
@@ -59,7 +60,9 @@ def parse_line(tagged_il: str, index: int, obj=Line, first_token=None):
         if token == '':
             continue
 
-        if (t.PAGE in token):
+        opentag_match = OPEN_TAG_CUSTOM_PATTERN_GROUPED.match(token)
+
+        if t.PAGE in token:
             m = PAGE_PATTERN.search(token)
             try:
                 line.add_part(PageNumber(token, m.group(1), m.group(2)))
@@ -67,6 +70,12 @@ def parse_line(tagged_il: str, index: int, obj=Line, first_token=None):
                 raise Exception(
                     'Could not parse page number at line: ' + str(index+1)
                 )
+        elif opentag_match:
+            line.add_part(OpenTagUser(token, 
+                opentag_match.group(1),
+                opentag_match.group(2),
+                opentag_match.group(3),
+                opentag_match.group(5)))
         elif t.HEMI in token:
             line.add_part(Hemistich(token))
         elif t.MILESTONE in token:
