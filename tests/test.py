@@ -115,6 +115,15 @@ class TestStringMethods(unittest.TestCase):
         self.assertTrue(isinstance(self.parsed.content[53].parts[1], NamedEntity))
         self.assertEqual(self.parsed.content[53].parts[1].ne_type, "death")
 
+        self.assertTrue(isinstance(self.parsed.content[68].parts[1], NamedEntity))
+        self.assertEqual(self.parsed.content[68].parts[1].ne_type, "birth")
+
+        self.assertTrue(isinstance(self.parsed.content[69].parts[1], NamedEntity))
+        self.assertEqual(self.parsed.content[69].parts[1].ne_type, "other")
+
+        self.assertTrue(isinstance(self.parsed.content[70].parts[1], NamedEntity))
+        self.assertEqual(self.parsed.content[70].parts[1].ne_type, "age")
+
     def test_riwayat(self):
         self.assertTrue(isinstance(self.parsed.content[54], Riwayat))
         self.assertTrue(isinstance(self.parsed.content[55], Line))
