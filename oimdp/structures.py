@@ -59,10 +59,8 @@ class OpenTagUser(LinePart):
 
 class OpenTagAuto(LinePart):
     """A custom tag added automatically"""
-    def __init__(self, orig: str, value: str, resp: str,
-                 t_type: str, category: str, review: str):
+    def __init__(self, orig: str, resp: str, t_type: str, category: str, review: str):
         self.orig = orig
-        self.value = value
         self.resp = resp
         self.t_type = t_type
         self.category = category

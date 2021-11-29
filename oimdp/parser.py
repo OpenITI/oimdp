@@ -1,6 +1,6 @@
 import sys
 import re
-from .structures import Document, Hemistich, Hukm, Isnad, Matn, NamedEntity, OpenTagUser, PageNumber, Paragraph, Line, RouteDist, RouteFrom, RouteTowa, Verse, Milestone
+from .structures import Document, Hemistich, Hukm, Isnad, Matn, NamedEntity, OpenTagAuto, OpenTagUser, PageNumber, Paragraph, Line, RouteDist, RouteFrom, RouteTowa, Verse, Milestone
 from .structures import SectionHeader, Editorial, DictionaryUnit, BioOrEvent
 from .structures import DoxographicalItem, MorphologicalPattern, TextPart
 from .structures import AdministrativeRegion, RouteOrDistance, Riwayat
@@ -11,8 +11,9 @@ OPEN_TAG_CUSTOM_PATTERN = r"@[^@]+?@[^_@]+?_[^_@]+?(?:_[^_@]+?)?@"
 OPEN_TAG_CUSTOM_PATTERN_GROUPED = re.compile(
     r"@([^@]+?)@([^_@]+?)_([^_@]+?)(_([^_@]+?))?@"
 )
-OPEN_TAG_AUTO_PATTERN = re.compile(
-    r"@([A-Z]{3})@([A-Z]{3,})@([A-Za-z])@(-@([0tf][ftalmr])@)?"
+OPEN_TAG_AUTO_PATTERN = r"@[A-Z]{3}@[A-Z]{3,}@[A-Za-z]+@(?:-@[0tf][ftalmr]@)?"
+OPEN_TAG_AUTO_PATTERN_GROUPED = re.compile(
+    r"@([A-Z]{3})@([A-Z]{3,})@([A-Za-z]+)@(-@([0tf][ftalmr])@)?"
 )
 YEAR_PATTERN = [rf"{t.YEAR_AGE}\d{{1,4}}", rf"{t.YEAR_DEATH}\d{{1,4}}", rf"{t.YEAR_BIRTH}\d{{1,4}}", rf"{t.YEAR_OTHER}\d{{1,4}}"]
 TOP_PATTERN = [rf"{t.TOP_FULL}\d{{1,2}}", rf"{t.TOP}\d{{1,2}}"]
@@ -31,7 +32,7 @@ def remove_phrase_lv_tags(s: str):
         text_only = text_only.replace(tag, '')
     # Open tag
     text_only = OPEN_TAG_CUSTOM_PATTERN_GROUPED.sub('', text_only)
-    text_only = OPEN_TAG_AUTO_PATTERN.sub('', text_only)
+    text_only = OPEN_TAG_AUTO_PATTERN_GROUPED.sub('', text_only)
     text_only = PAGE_PATTERN.sub('', text_only)
     return text_only
 
@@ -50,7 +51,7 @@ def parse_line(tagged_il: str, index: int, obj=Line, first_token=None):
     line = obj(il, text_only)
 
     # Split the line by tags. Make sure patterns do not include subgroups!
-    tokens = re.split(rf"(PageV\d+P\d+|{t.MILESTONE}|{OPEN_TAG_CUSTOM_PATTERN}|{'|'.join([re.escape(t) for t in t.PHRASE_LV_TAGS])}|{'|'.join([t for t in NAMED_ENTITIES_PATTERN])})", il)
+    tokens = re.split(rf"(PageV\d+P\d+|{t.MILESTONE}|{OPEN_TAG_AUTO_PATTERN}|{OPEN_TAG_CUSTOM_PATTERN}|{'|'.join([re.escape(t) for t in t.PHRASE_LV_TAGS])}|{'|'.join([t for t in NAMED_ENTITIES_PATTERN])})", il)
 
     # Some structures inject a token at the beginning of a line, like a riwāyaŧ's isnād
     if first_token:
@@ -60,7 +61,12 @@ def parse_line(tagged_il: str, index: int, obj=Line, first_token=None):
         if token == '':
             continue
 
-        opentag_match = OPEN_TAG_CUSTOM_PATTERN_GROUPED.match(token)
+        opentag_match = None
+        opentagauto_match = None
+
+        if token.startswith('@'):
+            opentag_match = OPEN_TAG_CUSTOM_PATTERN_GROUPED.match(token)
+            opentagauto_match = OPEN_TAG_AUTO_PATTERN_GROUPED.match(token)
 
         if t.PAGE in token:
             m = PAGE_PATTERN.search(token)
@@ -72,10 +78,16 @@ def parse_line(tagged_il: str, index: int, obj=Line, first_token=None):
                 )
         elif opentag_match:
             line.add_part(OpenTagUser(token, 
-                opentag_match.group(1),
-                opentag_match.group(2),
-                opentag_match.group(3),
-                opentag_match.group(5)))
+                opentag_match.group(1),  # user
+                opentag_match.group(2),  # t_type
+                opentag_match.group(3),  # t_subtype
+                opentag_match.group(5))) # t_subsubtype
+        elif opentagauto_match:
+            line.add_part(OpenTagAuto(token, 
+                opentagauto_match.group(1),  # resp
+                opentagauto_match.group(2),  # t_type                
+                opentagauto_match.group(3),  # category
+                opentagauto_match.group(5))) # review
         elif t.HEMI in token:
             line.add_part(Hemistich(token))
         elif t.MILESTONE in token:

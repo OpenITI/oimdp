@@ -4,7 +4,7 @@ sys.path.append(
     os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 import unittest 
 import oimdp
-from oimdp.structures import BioOrEvent, DictionaryUnit, Document, DoxographicalItem, Editorial, Hemistich, Hukm, Isnad, Line, Matn, Milestone, MorphologicalPattern, NamedEntity, OpenTagUser, PageNumber, Paragraph, Riwayat, RouteDist, RouteFrom, RouteOrDistance, RouteTowa, SectionHeader, TextPart, Verse
+from oimdp.structures import BioOrEvent, DictionaryUnit, Document, DoxographicalItem, Editorial, Hemistich, Hukm, Isnad, Line, Matn, Milestone, MorphologicalPattern, NamedEntity, OpenTagAuto, OpenTagUser, PageNumber, Paragraph, Riwayat, RouteDist, RouteFrom, RouteOrDistance, RouteTowa, SectionHeader, TextPart, Verse
 
 
 class TestStringMethods(unittest.TestCase):
@@ -151,6 +151,13 @@ class TestStringMethods(unittest.TestCase):
         self.assertEqual(self.parsed.content[79].parts[1].t_type, "CAT")
         self.assertEqual(self.parsed.content[79].parts[1].t_subtype, "SUBCAT")
         self.assertEqual(self.parsed.content[79].parts[1].t_subsubtype, "SUBSUBCAT")
+
+    def test_opentagsauto(self):
+        self.assertTrue(isinstance(self.parsed.content[81].parts[1], OpenTagAuto))
+        self.assertEqual(self.parsed.content[81].parts[1].resp, "RES")
+        self.assertEqual(self.parsed.content[81].parts[1].t_type, "TYPE")
+        self.assertEqual(self.parsed.content[81].parts[1].category, "Category")
+        self.assertEqual(self.parsed.content[81].parts[1].review, "fr")
 
     def test_riwayat(self):
         self.assertTrue(isinstance(self.parsed.content[54], Riwayat))
