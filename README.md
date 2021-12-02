@@ -28,11 +28,11 @@ Please see [the docs](https://openiti.github.io/oimdp/), but here are some highl
 
 `Content` classes contain an original value from the document and some extracted content such as a text string or a specific value.
 
-`Paragraph` contains a list of `Line` objects
+Most other structures are listed in sequence (e.g. a `Paragraph` is followed by a `Line`). 
 
-`Line` contains a list of `PhrasePart` objects
+`Line` objects and other line-level structures are divided in `PhrasePart` objects.
 
-`PhrasePart` phrase-level tags
+`PhrasePart` are phrase-level tags
 
 ## Develop
 
