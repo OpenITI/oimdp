@@ -1,0 +1,4 @@
+python3 -m pydoc -w oimdp
+python3 -m pydoc -w oimdp.parser
+python3 -m pydoc -w oimdp.structures
+python3 -m pydoc -w oimdp.tags
