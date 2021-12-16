@@ -117,33 +117,43 @@ class TestStringMethods(unittest.TestCase):
 
         self.assertTrue(isinstance(self.parsed.content[68].parts[1], NamedEntity))
         self.assertEqual(self.parsed.content[68].parts[1].ne_type, "birth")
+        self.assertEqual(self.parsed.content[68].parts[1].value, "597")
 
         self.assertTrue(isinstance(self.parsed.content[69].parts[1], NamedEntity))
         self.assertEqual(self.parsed.content[69].parts[1].ne_type, "other")
+        self.assertEqual(self.parsed.content[69].parts[1].value, "597")
 
         self.assertTrue(isinstance(self.parsed.content[70].parts[1], NamedEntity))
         self.assertEqual(self.parsed.content[70].parts[1].ne_type, "age")
+        self.assertEqual(self.parsed.content[70].parts[1].value, "597")
 
         self.assertTrue(isinstance(self.parsed.content[71].parts[1], NamedEntity))
         self.assertEqual(self.parsed.content[71].parts[1].ne_type, "soc")
+        self.assertEqual(self.parsed.content[71].parts[1].value, "07")
 
         self.assertTrue(isinstance(self.parsed.content[72].parts[1], NamedEntity))
         self.assertEqual(self.parsed.content[72].parts[1].ne_type, "soc")
+        self.assertEqual(self.parsed.content[72].parts[1].value, "07")
 
         self.assertTrue(isinstance(self.parsed.content[73].parts[1], NamedEntity))
         self.assertEqual(self.parsed.content[73].parts[1].ne_type, "top")
+        self.assertEqual(self.parsed.content[73].parts[1].value, "07")
 
         self.assertTrue(isinstance(self.parsed.content[74].parts[1], NamedEntity))
         self.assertEqual(self.parsed.content[74].parts[1].ne_type, "top")
+        self.assertEqual(self.parsed.content[74].parts[1].value, "07")
 
         self.assertTrue(isinstance(self.parsed.content[75].parts[1], NamedEntity))
         self.assertEqual(self.parsed.content[75].parts[1].ne_type, "per")
+        self.assertEqual(self.parsed.content[75].parts[1].value, "07")
 
         self.assertTrue(isinstance(self.parsed.content[76].parts[1], NamedEntity))
         self.assertEqual(self.parsed.content[76].parts[1].ne_type, "per")
+        self.assertEqual(self.parsed.content[76].parts[1].value, "07")
 
         self.assertTrue(isinstance(self.parsed.content[77].parts[1], NamedEntity))
         self.assertEqual(self.parsed.content[77].parts[1].ne_type, "src")
+        self.assertEqual(self.parsed.content[77].parts[1].value, "07")
 
     def test_opentags(self):
         self.assertTrue(isinstance(self.parsed.content[79].parts[1], OpenTagUser))
@@ -238,11 +248,7 @@ class TestStringMethods(unittest.TestCase):
         self.assertTrue(isinstance(self.parsed.content[65].parts[0], TextPart))
         self.assertEqual(self.parsed.content[65].parts[0].orig, " جمع العرب تحت لواء الرسول محمد عليه الصلاة  والسلام، وما يضاف إلى ذلك من")
 
-    # TODO: other tests.
-
-    # def test_clean_text(self):
-    #     text = self.parsed.get_clean_text(True)
-    #     # print(text)
+    # TODO: ADMINISTRATIVE REGIONS!
 
 
 if __name__ == "__main__":

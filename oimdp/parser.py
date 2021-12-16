@@ -30,6 +30,8 @@ def remove_phrase_lv_tags(s: str):
     text_only = s
     for tag in t.PHRASE_LV_TAGS:
         text_only = text_only.replace(tag, '')
+    for tag in NAMED_ENTITIES_PATTERN:
+        text_only = re.compile(tag).sub('', text_only)
     # Open tag
     text_only = OPEN_TAG_CUSTOM_PATTERN_GROUPED.sub('', text_only)
     text_only = OPEN_TAG_AUTO_PATTERN_GROUPED.sub('', text_only)
@@ -51,7 +53,7 @@ def parse_line(tagged_il: str, index: int, obj=Line, first_token=None):
     line = obj(il, text_only)
 
     # Split the line by tags. Make sure patterns do not include subgroups!
-    tokens = re.split(rf"(PageV\d+P\d+|{t.MILESTONE}|{OPEN_TAG_AUTO_PATTERN}|{OPEN_TAG_CUSTOM_PATTERN}|{'|'.join([re.escape(t) for t in t.PHRASE_LV_TAGS])}|{'|'.join([t for t in NAMED_ENTITIES_PATTERN])})", il)
+    tokens = re.split(rf"(PageV\d+P\d+|{OPEN_TAG_AUTO_PATTERN}|{OPEN_TAG_CUSTOM_PATTERN}|{'|'.join([re.escape(t) for t in t.PHRASE_LV_TAGS])}|{'|'.join([t for t in NAMED_ENTITIES_PATTERN])})", il)
 
     # Some structures inject a token at the beginning of a line, like a riwāyaŧ's isnād
     if first_token:
@@ -103,21 +105,27 @@ def parse_line(tagged_il: str, index: int, obj=Line, first_token=None):
         elif t.ROUTE_DIST in token:
             line.add_part(RouteDist(token))
         elif t.YEAR_BIRTH in token:
-            line.add_part(NamedEntity(token, 'birth'))
+            line.add_part(NamedEntity(token, token.replace(t.YEAR_BIRTH, ''), 'birth'))
         elif t.YEAR_DEATH in token:
-            line.add_part(NamedEntity(token, 'death'))
+            line.add_part(NamedEntity(token, token.replace(t.YEAR_DEATH, ''), 'death'))
         elif t.YEAR_AGE in token:
-            line.add_part(NamedEntity(token, 'age'))
+            line.add_part(NamedEntity(token, token.replace(t.YEAR_AGE, ''), 'age'))
         elif t.YEAR_OTHER in token:
-            line.add_part(NamedEntity(token, 'other'))
+            line.add_part(NamedEntity(token, token.replace(t.YEAR_OTHER, ''), 'other'))
         elif t.SRC in token:
-            line.add_part(NamedEntity(token, 'src'))
+            line.add_part(NamedEntity(token, token.replace(t.SRC, ''), 'src'))
+        elif t.SOC_FULL in token:
+            line.add_part(NamedEntity(token, token.replace(t.SOC_FULL, ''), 'soc'))
         elif t.SOC in token or t.SOC_FULL in token:
-            line.add_part(NamedEntity(token, 'soc'))
-        elif t.TOP in token or t.TOP_FULL in token:
-            line.add_part(NamedEntity(token, 'top'))
-        elif t.PER in token or t.PER_FULL in token:
-            line.add_part(NamedEntity(token, 'per'))
+            line.add_part(NamedEntity(token, token.replace(t.SOC, ''), 'soc'))
+        elif t.TOP_FULL in token:
+            line.add_part(NamedEntity(token, token.replace(t.TOP_FULL, ''), 'top'))
+        elif t.TOP in token:
+            line.add_part(NamedEntity(token, token.replace(t.TOP, ''), 'top'))
+        elif t.PER_FULL in token:
+            line.add_part(NamedEntity(token, token.replace(t.PER_FULL, ''), 'per'))
+        elif t.PER in token:
+            line.add_part(NamedEntity(token, token.replace(t.PER, ''), 'per'))
         else:
             line.add_part(TextPart(token))
     return line

@@ -36,8 +36,9 @@ class TextPart(LinePart):
 
 class NamedEntity(LinePart):
     """A named entity"""
-    def __init__(self, orig: str, ne_type: str):
+    def __init__(self, orig: str, value: str, ne_type: str):
         self.orig = orig
+        self.value = value
         self.ne_type: Literal["birth", "death", "age", "other", "top", "per", "soc", "src"] = ne_type
 
     def __str__(self):
