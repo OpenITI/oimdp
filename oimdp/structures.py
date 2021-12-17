@@ -32,17 +32,44 @@ class LinePart:
 
 class TextPart(LinePart):
     """Phrase-level text"""
+    def __init__(self, orig: str):
+        self.orig = orig
+        self.text = orig
 
+    def __str__(self):
+        return self.text
+
+
+class Date(LinePart):
+    """A date in running text"""
+    def __init__(self, orig: str, value: str, date_type: str):
+        self.orig = orig
+        self.value = value
+        self.date_type: Literal["birth", "death", "age", "other"] = date_type
+
+    def __str__(self):
+        return self.orig
+
+class Age(LinePart):
+    """A number indicating age in running text"""
+    def __init__(self, orig: str, value: str):
+        self.orig = orig
+        self.value = value
+
+    def __str__(self):
+        return self.orig
 
 class NamedEntity(LinePart):
     """A named entity"""
-    def __init__(self, orig: str, value: str, ne_type: str):
+    def __init__(self, orig: str, prefix: int, extent: int, text: str, ne_type: str):
         self.orig = orig
-        self.value = value
-        self.ne_type: Literal["birth", "death", "age", "other", "top", "per", "soc", "src"] = ne_type
+        self.text = text
+        self.prefix = prefix
+        self.extent = extent
+        self.ne_type: Literal["top", "per", "soc", "src"] = ne_type
 
     def __str__(self):
-        return self.value
+        return self.text
 
 
 class OpenTagUser(LinePart):

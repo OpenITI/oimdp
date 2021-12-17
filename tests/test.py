@@ -4,7 +4,7 @@ sys.path.append(
     os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 import unittest 
 import oimdp
-from oimdp.structures import BioOrEvent, DictionaryUnit, Document, DoxographicalItem, Editorial, Hemistich, Hukm, Isnad, Line, Matn, Milestone, MorphologicalPattern, NamedEntity, OpenTagAuto, OpenTagUser, PageNumber, Paragraph, Riwayat, RouteDist, RouteFrom, RouteOrDistance, RouteTowa, SectionHeader, TextPart, Verse
+from oimdp.structures import Age, BioOrEvent, Date, DictionaryUnit, Document, DoxographicalItem, Editorial, Hemistich, Hukm, Isnad, Line, Matn, Milestone, MorphologicalPattern, NamedEntity, OpenTagAuto, OpenTagUser, PageNumber, Paragraph, Riwayat, RouteDist, RouteFrom, RouteOrDistance, RouteTowa, SectionHeader, TextPart, Verse
 
 
 class TestStringMethods(unittest.TestCase):
@@ -112,48 +112,56 @@ class TestStringMethods(unittest.TestCase):
         self.assertTrue(isinstance(self.parsed.content[67].parts[1], Milestone))
 
     def test_named_entities(self):
-        self.assertTrue(isinstance(self.parsed.content[53].parts[1], NamedEntity))
-        self.assertEqual(self.parsed.content[53].parts[1].ne_type, "death")
+        self.assertTrue(isinstance(self.parsed.content[53].parts[1], Date))
+        self.assertEqual(self.parsed.content[53].parts[1].date_type, "death")
 
-        self.assertTrue(isinstance(self.parsed.content[68].parts[1], NamedEntity))
-        self.assertEqual(self.parsed.content[68].parts[1].ne_type, "birth")
+        self.assertTrue(isinstance(self.parsed.content[68].parts[1], Date))
+        self.assertEqual(self.parsed.content[68].parts[1].date_type, "birth")
         self.assertEqual(self.parsed.content[68].parts[1].value, "597")
 
-        self.assertTrue(isinstance(self.parsed.content[69].parts[1], NamedEntity))
-        self.assertEqual(self.parsed.content[69].parts[1].ne_type, "other")
+        self.assertTrue(isinstance(self.parsed.content[69].parts[1], Date))
+        self.assertEqual(self.parsed.content[69].parts[1].date_type, "other")
         self.assertEqual(self.parsed.content[69].parts[1].value, "597")
 
-        self.assertTrue(isinstance(self.parsed.content[70].parts[1], NamedEntity))
-        self.assertEqual(self.parsed.content[70].parts[1].ne_type, "age")
-        self.assertEqual(self.parsed.content[70].parts[1].value, "597")
+        self.assertTrue(isinstance(self.parsed.content[70].parts[1], Age))
+        self.assertEqual(self.parsed.content[70].parts[1].value, "059")
 
         self.assertTrue(isinstance(self.parsed.content[71].parts[1], NamedEntity))
         self.assertEqual(self.parsed.content[71].parts[1].ne_type, "soc")
-        self.assertEqual(self.parsed.content[71].parts[1].value, "07")
+        self.assertEqual(self.parsed.content[71].parts[1].prefix, 0)
+        self.assertEqual(self.parsed.content[71].parts[1].extent, 2)
+        self.assertEqual(self.parsed.content[71].parts[1].text, 'معمر شيخ: ')
+        self.assertEqual(self.parsed.content[71].parts[2].text, 'واسط.. 1"018: نزيل: ')
 
         self.assertTrue(isinstance(self.parsed.content[72].parts[1], NamedEntity))
         self.assertEqual(self.parsed.content[72].parts[1].ne_type, "soc")
-        self.assertEqual(self.parsed.content[72].parts[1].value, "07")
+        self.assertEqual(self.parsed.content[72].parts[1].prefix, 1)
+        self.assertEqual(self.parsed.content[72].parts[1].extent, 3)
 
         self.assertTrue(isinstance(self.parsed.content[73].parts[1], NamedEntity))
         self.assertEqual(self.parsed.content[73].parts[1].ne_type, "top")
-        self.assertEqual(self.parsed.content[73].parts[1].value, "07")
+        self.assertEqual(self.parsed.content[73].parts[1].prefix, 0)
+        self.assertEqual(self.parsed.content[73].parts[1].extent, 2)
 
         self.assertTrue(isinstance(self.parsed.content[74].parts[1], NamedEntity))
         self.assertEqual(self.parsed.content[74].parts[1].ne_type, "top")
-        self.assertEqual(self.parsed.content[74].parts[1].value, "07")
+        self.assertEqual(self.parsed.content[74].parts[1].prefix, 1)
+        self.assertEqual(self.parsed.content[74].parts[1].extent, 3)
 
         self.assertTrue(isinstance(self.parsed.content[75].parts[1], NamedEntity))
         self.assertEqual(self.parsed.content[75].parts[1].ne_type, "per")
-        self.assertEqual(self.parsed.content[75].parts[1].value, "07")
+        self.assertEqual(self.parsed.content[75].parts[1].prefix, 0)
+        self.assertEqual(self.parsed.content[75].parts[1].extent, 2)
 
         self.assertTrue(isinstance(self.parsed.content[76].parts[1], NamedEntity))
         self.assertEqual(self.parsed.content[76].parts[1].ne_type, "per")
-        self.assertEqual(self.parsed.content[76].parts[1].value, "07")
+        self.assertEqual(self.parsed.content[76].parts[1].prefix, 1)
+        self.assertEqual(self.parsed.content[76].parts[1].extent, 3)
 
         self.assertTrue(isinstance(self.parsed.content[77].parts[1], NamedEntity))
         self.assertEqual(self.parsed.content[77].parts[1].ne_type, "src")
-        self.assertEqual(self.parsed.content[77].parts[1].value, "07")
+        self.assertEqual(self.parsed.content[77].parts[1].prefix, 0)
+        self.assertEqual(self.parsed.content[77].parts[1].extent, 3)
 
     def test_opentags(self):
         self.assertTrue(isinstance(self.parsed.content[79].parts[1], OpenTagUser))

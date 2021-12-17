@@ -1,6 +1,6 @@
 import sys
 import re
-from .structures import Document, Hemistich, Hukm, Isnad, Matn, NamedEntity, OpenTagAuto, OpenTagUser, PageNumber, Paragraph, Line, RouteDist, RouteFrom, RouteTowa, Verse, Milestone
+from .structures import Age, Date, Document, Hemistich, Hukm, Isnad, Matn, NamedEntity, OpenTagAuto, OpenTagUser, PageNumber, Paragraph, Line, RouteDist, RouteFrom, RouteTowa, Verse, Milestone
 from .structures import SectionHeader, Editorial, DictionaryUnit, BioOrEvent
 from .structures import DoxographicalItem, MorphologicalPattern, TextPart
 from .structures import AdministrativeRegion, RouteOrDistance, Riwayat
@@ -40,6 +40,7 @@ def remove_phrase_lv_tags(s: str):
 
 
 def parse_line(tagged_il: str, index: int, obj=Line, first_token=None):
+    """ parse a line text into LineParts by splitting it by tags and patterns """
     # remove line tag
     il = tagged_il.replace(t.LINE, '')
 
@@ -58,6 +59,10 @@ def parse_line(tagged_il: str, index: int, obj=Line, first_token=None):
     # Some structures inject a token at the beginning of a line, like a riwāyaŧ's isnād
     if first_token:
         line.add_part(first_token(""))
+
+    # Named entities include in their `text` property a given number of words from the following text token
+    # This variable is used to keep track. A "word" is just a space-separated token.
+    include_words = 0
 
     for token in tokens:
         if token == '':
@@ -105,29 +110,55 @@ def parse_line(tagged_il: str, index: int, obj=Line, first_token=None):
         elif t.ROUTE_DIST in token:
             line.add_part(RouteDist(token))
         elif t.YEAR_BIRTH in token:
-            line.add_part(NamedEntity(token, token.replace(t.YEAR_BIRTH, ''), 'birth'))
+            line.add_part(Date(token, token.replace(t.YEAR_BIRTH, ''), 'birth'))
         elif t.YEAR_DEATH in token:
-            line.add_part(NamedEntity(token, token.replace(t.YEAR_DEATH, ''), 'death'))
-        elif t.YEAR_AGE in token:
-            line.add_part(NamedEntity(token, token.replace(t.YEAR_AGE, ''), 'age'))
+            line.add_part(Date(token, token.replace(t.YEAR_DEATH, ''), 'death'))
         elif t.YEAR_OTHER in token:
-            line.add_part(NamedEntity(token, token.replace(t.YEAR_OTHER, ''), 'other'))
+            line.add_part(Date(token, token.replace(t.YEAR_OTHER, ''), 'other'))
+        elif t.YEAR_AGE in token:
+            line.add_part(Age(token, token.replace(t.YEAR_AGE, '')))
         elif t.SRC in token:
-            line.add_part(NamedEntity(token, token.replace(t.SRC, ''), 'src'))
+            val = token.replace(t.SRC, '')
+            include_words = int(val[1])
+            line.add_part(NamedEntity(token, int(val[0]), include_words, "", 'src'))
         elif t.SOC_FULL in token:
-            line.add_part(NamedEntity(token, token.replace(t.SOC_FULL, ''), 'soc'))
-        elif t.SOC in token or t.SOC_FULL in token:
-            line.add_part(NamedEntity(token, token.replace(t.SOC, ''), 'soc'))
+            val = token.replace(t.SOC_FULL, '')
+            include_words = int(val[1])
+            line.add_part(NamedEntity(token, int(val[0]), include_words, "", 'soc'))
+        elif t.SOC in token in token:
+            val = token.replace(t.SOC, '')
+            include_words = int(val[1])
+            line.add_part(NamedEntity(token, int(val[0]), include_words, "", 'soc'))
         elif t.TOP_FULL in token:
-            line.add_part(NamedEntity(token, token.replace(t.TOP_FULL, ''), 'top'))
+            val = token.replace(t.TOP_FULL, '')
+            include_words = int(val[1])
+            line.add_part(NamedEntity(token, int(val[0]), include_words, "", 'top'))
         elif t.TOP in token:
-            line.add_part(NamedEntity(token, token.replace(t.TOP, ''), 'top'))
+            val = token.replace(t.TOP, '')
+            include_words = int(val[1])
+            line.add_part(NamedEntity(token, int(val[0]), include_words, "", 'top'))
         elif t.PER_FULL in token:
-            line.add_part(NamedEntity(token, token.replace(t.PER_FULL, ''), 'per'))
+            val = token.replace(t.PER_FULL, '')
+            include_words = int(val[1])
+            line.add_part(NamedEntity(token, int(val[0]), include_words, "", 'per'))
         elif t.PER in token:
-            line.add_part(NamedEntity(token, token.replace(t.PER, ''), 'per'))
+            val = token.replace(t.PER, '')
+            include_words = int(val[1])
+            line.add_part(NamedEntity(token, int(val[0]), include_words, "", 'per'))
         else:
-            line.add_part(TextPart(token))
+            if include_words > 0:
+                rest = ""
+                words = token.strip().split()
+                for pos, word in enumerate(reversed(words)): # reversing split for r-t-l script
+                    if (pos < include_words):
+                        line.parts[-1].text = line.parts[-1].text + word + " "
+                    else:
+                        rest = rest + word + " "
+                if len(rest):
+                    line.add_part(TextPart(rest))
+                include_words = 0
+            else:
+                line.add_part(TextPart(token))
     return line
 
 
