@@ -137,8 +137,8 @@ class TestStringMethods(unittest.TestCase):
         self.assertEqual(self.parsed.content[71].parts[1].ne_type, "soc")
         self.assertEqual(self.parsed.content[71].parts[1].prefix, 0)
         self.assertEqual(self.parsed.content[71].parts[1].extent, 2)
-        self.assertEqual(self.parsed.content[71].parts[1].text, 'معمر شيخ: ')
-        self.assertEqual(self.parsed.content[71].parts[2].text, 'واسط.. 1"018: نزيل: ')
+        self.assertEqual(self.parsed.content[71].parts[1].text, 'نزيل: 1"018: ')
+        self.assertEqual(self.parsed.content[71].parts[2].text, 'واسط.. شيخ: معمر ')
 
         self.assertTrue(isinstance(self.parsed.content[72].parts[1], NamedEntity))
         self.assertEqual(self.parsed.content[72].parts[1].ne_type, "soc")
