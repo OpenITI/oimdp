@@ -6,12 +6,10 @@ PAGE = "PageV"
 HEMI = "%~%"
 LINE = "~~"
 MILESTONE = "Milestone300"
-HEADER1 = "### |"
-HEADER2 = "### ||"
-HEADER3 = "### |||"
-HEADER4 = "### ||||"
-HEADER5 = "### |||||"
+HEADER = "### |"
 EDITORIAL = "### |EDITOR|"
+APPENDIX = "### |APPENDIX|"
+PARATEXT = "### |PARATEXT|"
 DIC = "### $DIC_"
 DIC_NIS = "### $DIC_NIS$"
 DIC_TOP = "### $DIC_TOP$"
@@ -56,8 +54,6 @@ MATN = "@MATN@"
 HUKM = "@HUKM@"
 
 # GROUPS
-# NB these are ordered to allow safe matching, e.g. "### ||" before "### |"
-HEADERS = [HEADER5, HEADER4, HEADER3, HEADER2, HEADER1]
 DICTIONARIES = [DIC_NIS, DIC_TOP, DIC_LEX, DIC_BIB]
 BIOS_EVENTS = [LIST_NAMES_FULL, LIST_NAMES, BIO_WOM_FULL, BIO_MAN_FULL, BIO_REF_FULL, LIST_EVENTS, EVENT,
                BIO_REF, BIO_WOM, BIO_MAN, EVENT_FULL, LIST_EVENTS_FULL]

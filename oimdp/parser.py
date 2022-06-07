@@ -1,7 +1,7 @@
 import sys
 import re
 from .structures import Age, Date, Document, Hemistich, Hukm, Isnad, Matn, NamedEntity, OpenTagAuto, OpenTagUser, PageNumber, Paragraph, Line, RouteDist, RouteFrom, RouteTowa, Verse, Milestone
-from .structures import SectionHeader, Editorial, DictionaryUnit, BioOrEvent
+from .structures import SectionHeader, Editorial, Appendix, Paratext, DictionaryUnit, BioOrEvent
 from .structures import DoxographicalItem, MorphologicalPattern, TextPart
 from .structures import AdministrativeRegion, RouteOrDistance, Riwayat
 from . import tags as t
@@ -10,6 +10,8 @@ PAGE_PATTERN = rf"{t.PAGE}[^P]+P\d+[AB]?"
 PAGE_PATTERN_GROUPED = rf"{t.PAGE}([^P]+)P(\d+[AB]?)"
 PAGE_RE = re.compile(PAGE_PATTERN_GROUPED)
 MILESTONE_PATTERN = r"Milestone300|ms[A-Z]?\d+"
+HEADER_PATTERN = r"### \|+"
+HEADER_PATTERN_GROUPED = r"### (\|+)"
 OPEN_TAG_CUSTOM_PATTERN = r"@[^@]+?@[^_@]+?_[^_@]+?(?:_[^_@]+?)?@"
 OPEN_TAG_CUSTOM_PATTERN_GROUPED = re.compile(
     r"@([^@]+?)@([^_@]+?)_([^_@]+?)(_([^_@]+?))?@"
@@ -249,28 +251,23 @@ def parser(text: str, strict: bool = False):
         elif (il.startswith(t.LINE)):
             document.add_content(parse_line(il, i))
 
-        # Editorial section
+        # Sections
         elif (il.startswith(t.EDITORIAL)):
             document.add_content(Editorial(il))
+        elif (il.startswith(t.APPENDIX)):
+            document.add_content(Appendix(il))
+        elif (il.startswith(t.PARATEXT)):
+            document.add_content(Paratext(il))
 
         # Section headers
-        elif (il.startswith(t.HEADER1)):
+        elif (il.startswith(t.HEADER)):
             value = il
-            for tag in t.HEADERS:
-                value = value.replace(tag, '')
+            header_re = re.compile(HEADER_PATTERN_GROUPED)
+            value = header_re.sub('', value)
             # remove other phrase level tags
             value = remove_phrase_lv_tags(value)
-            # TODO: capture tags as PhraseParts
-            level = 1
-            if (t.HEADER5 in il):
-                level = 5
-            elif (t.HEADER4 in il):
-                level = 4
-            elif (t.HEADER3 in il):
-                level = 3
-            elif (t.HEADER2 in il):
-                level = 2
-            
+            level = len(header_re.match(il).group(1))
+
             document.add_content(SectionHeader(il, value, level))
 
         # Dictionary entry

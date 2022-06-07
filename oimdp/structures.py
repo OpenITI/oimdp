@@ -187,6 +187,22 @@ class Editorial(Content):
     def __str__(self):
         return ""
 
+class Appendix(Content):
+    """Marks the beginning of an appendix"""
+    def __init__(self, orig: str):
+        self.orig = orig
+
+    def __str__(self):
+        return ""
+
+class Paratext(Content):
+    """Marks the beginning of a paratextual section"""
+    def __init__(self, orig: str):
+        self.orig = orig
+
+    def __str__(self):
+        return ""
+
 
 class DictionaryUnit(Content):
     """Marks a dictionary unit"""

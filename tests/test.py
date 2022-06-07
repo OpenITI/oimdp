@@ -4,7 +4,7 @@ sys.path.append(
     os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 import unittest 
 import oimdp
-from oimdp.structures import Age, BioOrEvent, Date, DictionaryUnit, Document, DoxographicalItem, Editorial, Hemistich, Hukm, Isnad, Line, Matn, Milestone, MorphologicalPattern, NamedEntity, OpenTagAuto, OpenTagUser, PageNumber, Paragraph, Riwayat, RouteDist, RouteFrom, RouteOrDistance, RouteTowa, SectionHeader, TextPart, Verse
+from oimdp.structures import Age, Appendix, BioOrEvent, Date, DictionaryUnit, Document, DoxographicalItem, Editorial, Hemistich, Hukm, Isnad, Line, Matn, Milestone, MorphologicalPattern, NamedEntity, OpenTagAuto, OpenTagUser, PageNumber, Paragraph, Paratext, Riwayat, RouteDist, RouteFrom, RouteOrDistance, RouteTowa, SectionHeader, TextPart, Verse
 
 
 class TestStringMethods(unittest.TestCase):
@@ -96,8 +96,10 @@ class TestStringMethods(unittest.TestCase):
         check(44, "pos")
         check(46, "sec")
 
-    def test_editorial(self):
+    def test_sections(self):
         self.assertTrue(isinstance(self.parsed.content[48], Editorial))
+        self.assertTrue(isinstance(self.parsed.content[98], Appendix))
+        self.assertTrue(isinstance(self.parsed.content[101], Paratext))
 
     def test_morphological(self):
         self.assertTrue(isinstance(self.parsed.content[50], MorphologicalPattern))
@@ -235,6 +237,10 @@ class TestStringMethods(unittest.TestCase):
         self.assertTrue(isinstance(self.parsed.content[62], SectionHeader))
         self.assertEqual(self.parsed.content[62].value, " (نهج ابن هشام في هذا الكتاب) :")
         self.assertEqual(self.parsed.content[62].level, 5)
+
+        self.assertTrue(isinstance(self.parsed.content[97], SectionHeader))
+        self.assertEqual(self.parsed.content[97].value, " DEEP HEADER")
+        self.assertEqual(self.parsed.content[97].level, 9)
 
     def test_verse(self):
         self.assertTrue(isinstance(self.parsed.content[63], Verse))
