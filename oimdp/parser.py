@@ -6,7 +6,7 @@ from .structures import DoxographicalItem, MorphologicalPattern, TextPart
 from .structures import AdministrativeRegion, RouteOrDistance, Riwayat
 from . import tags as t
 
-PAGE_PATTERN = re.compile(r"PageV(\d+)P(\d+)")
+PAGE_PATTERN = re.compile(r"PageV([^P]+)P(\d+[AB]?)")
 OPEN_TAG_CUSTOM_PATTERN = r"@[^@]+?@[^_@]+?_[^_@]+?(?:_[^_@]+?)?@"
 OPEN_TAG_CUSTOM_PATTERN_GROUPED = re.compile(
     r"@([^@]+?)@([^_@]+?)_([^_@]+?)(_([^_@]+?))?@"
