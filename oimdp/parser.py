@@ -154,7 +154,7 @@ def parse_line(tagged_il: str, index: int, obj=Line, first_token=None):
             if include_words > 0:
                 rest = ""
                 words = token.strip().split()
-                for pos, word in enumerate(reversed(words)): # reversing split for r-t-l script
+                for pos, word in enumerate(words):
                     if (pos < include_words):
                         line.parts[-1].text = line.parts[-1].text + word + " "
                     else:
