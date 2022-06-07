@@ -43,6 +43,10 @@ class TestStringMethods(unittest.TestCase):
                         PageNumber))
         self.assertEqual(str(self.parsed.content[1].parts[1]),
                          "Vol. 00, p. 000")
+        self.assertTrue(isinstance(self.parsed.content[96].parts[1], 
+                        PageNumber))
+        self.assertEqual(str(self.parsed.content[96].parts[1]),
+                         "Vol. 01M, p. 001")
 
     def test_bio_or_event(self):
         def check(location: int, type: str):
@@ -110,6 +114,7 @@ class TestStringMethods(unittest.TestCase):
     def test_milestone(self):
         self.assertTrue(isinstance(self.parsed.content[67], Line))
         self.assertTrue(isinstance(self.parsed.content[67].parts[1], Milestone))
+        self.assertTrue(isinstance(self.parsed.content[67].parts[3], Milestone))
 
     def test_named_entities(self):
         self.assertTrue(isinstance(self.parsed.content[53].parts[1], Date))
