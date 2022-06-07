@@ -1,8 +1,8 @@
 from .parser import parser
 
 
-def parse(text):
-    return parser(text)
+def parse(text, strict = False):
+    return parser(text, strict)
 
 
 __all__ = [

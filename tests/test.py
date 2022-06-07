@@ -18,7 +18,7 @@ class TestStringMethods(unittest.TestCase):
         test_file = open(filepath, "r")
         self.text = test_file.read()
         test_file.close()
-        self.parsed = oimdp.parse(self.text)
+        self.parsed = oimdp.parse(self.text, strict=True)
 
     def generic_check(self, datatype, location: int, type: str, property: str = ""):
             content = self.parsed.content[location]

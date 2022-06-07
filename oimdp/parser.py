@@ -162,7 +162,7 @@ def parse_line(tagged_il: str, index: int, obj=Line, first_token=None):
     return line
 
 
-def parser(text: str):
+def parser(text: str, strict: bool = False):
     """Parses an OpenITI mARkdown file and returns a Document object"""
     document = Document(text)
 
@@ -171,8 +171,12 @@ def parser(text: str):
 
     # Magic value
     magic_value = ilines[0]
-
-    if magic_value.strip() != "######OpenITI#":
+    
+    if strict and magic_value.strip() != "######OpenITI#":
+        raise Exception(
+            "This does not appear to be an OpenITI mARkdown document (strict mode)")
+        sys.exit(1)
+    elif not magic_value.strip().startswith("######OpenITI#"):
         raise Exception(
             "This does not appear to be an OpenITI mARkdown document")
         sys.exit(1)
