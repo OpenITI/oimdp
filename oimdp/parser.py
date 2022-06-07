@@ -6,7 +6,10 @@ from .structures import DoxographicalItem, MorphologicalPattern, TextPart
 from .structures import AdministrativeRegion, RouteOrDistance, Riwayat
 from . import tags as t
 
-PAGE_PATTERN = re.compile(r"PageV([^P]+)P(\d+[AB]?)")
+PAGE_PATTERN = rf"{t.PAGE}[^P]+P\d+[AB]?"
+PAGE_PATTERN_GROUPED = rf"{t.PAGE}([^P]+)P(\d+[AB]?)"
+PAGE_RE = re.compile(PAGE_PATTERN_GROUPED)
+MILESTONE_PATTERN = r"Milestone300|ms[A-Z]?\d+"
 OPEN_TAG_CUSTOM_PATTERN = r"@[^@]+?@[^_@]+?_[^_@]+?(?:_[^_@]+?)?@"
 OPEN_TAG_CUSTOM_PATTERN_GROUPED = re.compile(
     r"@([^@]+?)@([^_@]+?)_([^_@]+?)(_([^_@]+?))?@"
@@ -35,7 +38,7 @@ def remove_phrase_lv_tags(s: str):
     # Open tag
     text_only = OPEN_TAG_CUSTOM_PATTERN_GROUPED.sub('', text_only)
     text_only = OPEN_TAG_AUTO_PATTERN_GROUPED.sub('', text_only)
-    text_only = PAGE_PATTERN.sub('', text_only)
+    text_only = PAGE_RE.sub('', text_only)
     return text_only
 
 
@@ -54,7 +57,7 @@ def parse_line(tagged_il: str, index: int, obj=Line, first_token=None):
     line = obj(il, text_only)
 
     # Split the line by tags. Make sure patterns do not include subgroups!
-    tokens = re.split(rf"(PageV\d+P\d+|{OPEN_TAG_AUTO_PATTERN}|{OPEN_TAG_CUSTOM_PATTERN}|{'|'.join([re.escape(t) for t in t.PHRASE_LV_TAGS])}|{'|'.join([t for t in NAMED_ENTITIES_PATTERN])})", il)
+    tokens = re.split(rf"({PAGE_PATTERN}|{MILESTONE_PATTERN}|{OPEN_TAG_AUTO_PATTERN}|{OPEN_TAG_CUSTOM_PATTERN}|{'|'.join([re.escape(t) for t in t.PHRASE_LV_TAGS])}|{'|'.join([t for t in NAMED_ENTITIES_PATTERN])})", il)
 
     # Some structures inject a token at the beginning of a line, like a riwāyaŧ's isnād
     if first_token:
@@ -76,13 +79,15 @@ def parse_line(tagged_il: str, index: int, obj=Line, first_token=None):
             opentagauto_match = OPEN_TAG_AUTO_PATTERN_GROUPED.match(token)
 
         if t.PAGE in token:
-            m = PAGE_PATTERN.search(token)
+            m = PAGE_RE.search(token)
             try:
                 line.add_part(PageNumber(token, m.group(1), m.group(2)))
             except Exception:
                 raise Exception(
                     'Could not parse page number at line: ' + str(index+1)
                 )
+        elif re.compile(MILESTONE_PATTERN).match(token):
+            line.add_part(Milestone(token))
         elif opentag_match:
             line.add_part(OpenTagUser(token, 
                 opentag_match.group(1),  # user
@@ -97,8 +102,6 @@ def parse_line(tagged_il: str, index: int, obj=Line, first_token=None):
                 opentagauto_match.group(5))) # review
         elif t.HEMI in token:
             line.add_part(Hemistich(token))
-        elif t.MILESTONE in token:
-            line.add_part(Milestone(token))
         elif t.MATN in token:
             line.add_part(Matn(token))
         elif t.HUKM in token:
@@ -206,7 +209,7 @@ def parser(text: str, strict: bool = False):
 
         # Content-level page numbers
         elif (il.startswith(t.PAGE)):
-            pv = PAGE_PATTERN.search(il)
+            pv = PAGE_RE.search(il)
             try:
                 document.add_content(PageNumber(il, pv.group(1), pv.group(2)))
             except Exception:
