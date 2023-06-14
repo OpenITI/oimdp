@@ -16,5 +16,5 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     test_suite="tests",
-    python_requires=">=3.8.*",
+    python_requires=">=3.8",
 )
