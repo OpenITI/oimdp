@@ -8,4 +8,4 @@ def parse(text, strict = False):
 __all__ = [
    'parse'
 ]
-__version__ = '1.1.1'
+__version__ = '1.2.1'
