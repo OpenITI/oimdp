@@ -181,7 +181,7 @@ def parser(text: str, strict: bool = False):
         raise Exception(
             "This does not appear to be an OpenITI mARkdown document (strict mode)")
         sys.exit(1)
-    elif not magic_value.strip().startswith("######OpenITI#"):
+    elif not magic_value.strip().encode('ascii', 'ignore').decode('ascii').startswith("######OpenITI#"):
         raise Exception(
             "This does not appear to be an OpenITI mARkdown document")
         sys.exit(1)
